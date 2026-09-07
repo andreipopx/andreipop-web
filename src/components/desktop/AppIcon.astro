@@ -7,18 +7,8 @@ interface Props {
 }
 const { slug, label, icon, secondary } = Astro.props;
 
-const iconVars: Record<Props['icon'], string> = {
-  note:    'note',
-  box:     'box',
-  star:    'star',
-  compass: 'compass',
-  mail:    'mail',
-  photos:  'photos',
-  pen:     'pen',
-};
-const v = iconVars[icon];
-const fromCss = `var(--icon-${v}-from)`;
-const toCss   = `var(--icon-${v}-to)`;
+const fromCss = `var(--icon-${icon}-from)`;
+const toCss   = `var(--icon-${icon}-to)`;
 ---
 <button
   type="button"
@@ -31,74 +21,67 @@ const toCss   = `var(--icon-${v}-to)`;
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
       <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <rect x="12" y="9" width="30" height="36" rx="3" fill="#fffbeb"/>
-      <rect x="12" y="9" width="30" height="7" fill="#f59e0b" opacity="0.9"/>
-      <line x1="17" y1="24" x2="37" y2="24" stroke={toCss} stroke-width="1.2" opacity="0.7"/>
-      <line x1="17" y1="29" x2="37" y2="29" stroke={toCss} stroke-width="1.2" opacity="0.6"/>
-      <line x1="17" y1="34" x2="32" y2="34" stroke={toCss} stroke-width="1.2" opacity="0.55"/>
-      <line x1="17" y1="39" x2="35" y2="39" stroke={toCss} stroke-width="1.2" opacity="0.5"/>
+      <rect x="14" y="12" width="26" height="30" rx="2" fill="#fff"/>
+      <line x1="18" y1="21" x2="36" y2="21" stroke={toCss} stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="18" y1="27" x2="36" y2="27" stroke={toCss} stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="18" y1="33" x2="30" y2="33" stroke={toCss} stroke-width="1.8" stroke-linecap="round"/>
     </svg>
   )}
   {icon === 'box' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
       <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <path d="M27 9 L44 17 L44 37 L27 45 L10 37 L10 17 Z" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="1"/>
-      <path d="M10 17 L27 25 L44 17" fill="none" stroke={toCss} stroke-width="1"/>
-      <path d="M27 25 L27 45" stroke={toCss} stroke-width="1" opacity="0.5"/>
-      <path d="M27 9 L27 25 M18.5 13 L35.5 21 M35.5 13 L18.5 21" stroke={toCss} stroke-width="1" opacity="0.6"/>
+      <path d="M27 12 L42 19 L42 35 L27 42 L12 35 L12 19 Z" fill="#fff"/>
+      <path d="M12 19 L27 26 L42 19" stroke={toCss} stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+      <path d="M27 26 L27 42" stroke={toCss} stroke-width="1.6"/>
     </svg>
   )}
   {icon === 'star' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
-      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
+      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <path d="M27 8 L32 22 L47 22 L35 30 L39 44 L27 36 L15 44 L19 30 L7 22 L22 22 Z" fill="#fef9c3" stroke="#78350f" stroke-width="0.8" stroke-linejoin="round"/>
+      <path d="M27 10 L32 22 L45 22 L34 30 L38 43 L27 35 L16 43 L20 30 L9 22 L22 22 Z" fill="#fff" stroke-linejoin="round"/>
     </svg>
   )}
   {icon === 'compass' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
       <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <circle cx="27" cy="27" r="17" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="1.2"/>
-      <path d="M27 13 L30 27 L27 24 Z" fill="#dc2626"/>
-      <path d="M27 41 L24 27 L27 30 Z" fill="#0f1115"/>
-      <circle cx="27" cy="27" r="2" fill="#0f1115"/>
+      <circle cx="27" cy="27" r="16" fill="#fff"/>
+      <path d="M27 13 L31 27 L27 24 Z" fill="#ef4444"/>
+      <path d="M27 41 L23 27 L27 30 Z" fill={toCss}/>
+      <circle cx="27" cy="27" r="2" fill={toCss}/>
     </svg>
   )}
   {icon === 'mail' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
       <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <rect x="9" y="16" width="36" height="24" rx="3" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="0.8"/>
-      <path d="M9 16 L27 30 L45 16" fill="none" stroke={toCss} stroke-width="1"/>
+      <rect x="9" y="17" width="36" height="22" rx="2" fill="#fff"/>
+      <path d="M9 17 L27 30 L45 17" stroke={toCss} stroke-width="1.8" fill="none" stroke-linejoin="round"/>
     </svg>
   )}
   {icon === 'photos' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
       <defs>
         <linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient>
-        <linearGradient id={`sky-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5b4fc"/><stop offset="0.5" stop-color="#fbcfe8"/><stop offset="1" stop-color="#fed7aa"/></linearGradient>
+        <linearGradient id={`sky-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5b4fc"/><stop offset="1" stop-color="#fbcfe8"/></linearGradient>
       </defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <rect x="10" y="12" width="34" height="26" rx="3" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="0.8"/>
-      <rect x="12" y="14" width="30" height="18" fill={`url(#sky-${slug})`}/>
-      <circle cx="35" cy="20" r="3" fill="#fbbf24" opacity="0.9"/>
-      <path d="M12 32 L18 26 L25 30 L32 24 L42 32 Z" fill="#7c3aed" opacity="0.7"/>
-      <circle cx="27" cy="42" r="3" fill={toCss}/>
-      <circle cx="27" cy="42" r="1.5" fill="#fff"/>
+      <rect x="10" y="14" width="34" height="26" rx="2" fill="#fff"/>
+      <rect x="13" y="17" width="28" height="18" fill={`url(#sky-${slug})`}/>
+      <path d="M13 30 L20 24 L27 28 L35 22 L41 30 L41 35 L13 35 Z" fill={toCss}/>
+      <circle cx="35" cy="21" r="2.5" fill="#fef08a"/>
     </svg>
   )}
   {icon === 'pen' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
       <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <rect x="10" y="12" width="24" height="30" rx="1" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="0.6"/>
-      <line x1="14" y1="20" x2="30" y2="20" stroke={toCss} stroke-width="0.6" opacity="0.4"/>
-      <line x1="14" y1="26" x2="28" y2="26" stroke={toCss} stroke-width="0.6" opacity="0.4"/>
-      <path d="M17 37 Q19 34 22 37 Q25 40 28 36" fill="none" stroke={toCss} stroke-width="1.2" stroke-linecap="round"/>
-      <path d="M38 10 L48 10 L46 20 L36 42 L32 44 L34 40 L44 18 Z" fill="#0f1115" stroke={toCss} stroke-width="0.6" stroke-linejoin="round"/>
-      <path d="M32 44 L34 40 L36 42 Z" fill="#dbeafe"/>
+      <rect x="10" y="14" width="24" height="28" rx="2" fill="#fff"/>
+      <path d="M15 34 Q19 30 24 34 Q28 37 32 32" fill="none" stroke={toCss} stroke-width="2" stroke-linecap="round"/>
+      <path d="M38 10 L46 10 L44 18 L34 40 L30 42 L32 38 L42 16 Z" fill={toCss}/>
+      <path d="M30 42 L32 38 L34 40 Z" fill="#fff"/>
     </svg>
   )}
   <span class="app-icon-label">{label}</span>
