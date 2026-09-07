@@ -14,17 +14,19 @@ const updated = entry?.data.updated;
         Actualizado {updated.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
       </div>
     )}
-    <div style="font-size: 15px; line-height: 1.7; color: #1a1c22;">
+    <div class="vida-body">
       {Content && <Content />}
     </div>
   </div>
 </Window>
 
 <style is:global>
-  [data-window="vida"] .win-body h2 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; letter-spacing: -0.01em; color: #0f1115; }
-  [data-window="vida"] .win-body h2:first-child { margin-top: 0; }
-  [data-window="vida"] .win-body ul { padding-left: 20px; margin: 8px 0; }
-  [data-window="vida"] .win-body li { margin: 4px 0; }
-  [data-window="vida"] .win-body p { margin: 8px 0; }
-  [data-window="vida"] .win-body em { color: #6b7280; }
+  [data-window="vida"] .vida-body { font-size: 15px; line-height: 1.7; color: var(--color-ink); }
+  [data-window="vida"] .vida-body h2 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; letter-spacing: -0.01em; color: var(--color-ink); }
+  [data-window="vida"] .vida-body h2:first-child { margin-top: 0; }
+  [data-window="vida"] .vida-body ul { padding-left: 20px; margin: 8px 0; }
+  [data-window="vida"] .vida-body li { margin: 4px 0; color: var(--color-ink); }
+  [data-window="vida"] .vida-body p { margin: 8px 0; color: var(--color-ink); }
+  [data-window="vida"] .vida-body em { color: var(--color-muted); }
+  [data-window="vida"] .vida-body strong { color: var(--color-ink); }
 </style>
