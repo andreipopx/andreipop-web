@@ -325,12 +325,14 @@ const phaseAt = (hour: number): PhaseColors => {
   };
 
   if (hour >= 22 || hour < 5) {
+    // Fase noche en LIGHT MODE: violetas con brillo (no negro total).
+    // El tintDark aplicará el negro real cuando el user esté en dark mode.
     const m = arcMoon(hour);
     return {
-      top: '#020617', mid1: '#0c1a3e', mid2: '#1e1b4b', bottom: '#312e81',
+      top: '#312e81', mid1: '#4338ca', mid2: '#7c3aed', bottom: '#a78bfa',
       astro: '#f1f5f9', astroX: m.x, astroY: m.y,
-      glow: 0.15, stars: 1, craters: true,
-      mtnBack: 0.6, mtnMid: 0.8, mtnFront: 0.95,
+      glow: 0.35, stars: 0.55, craters: true,
+      mtnBack: 0.4, mtnMid: 0.65, mtnFront: 0.85,
     };
   }
   if (hour < 7) {
@@ -380,20 +382,19 @@ const phaseAt = (hour: number): PhaseColors => {
 };
 
 const tintDark = (p: PhaseColors) => {
-  // Oscurece la paleta manteniendo posición del astro. Reemplaza el cielo
-  // por gradiente noche y aumenta opacidad de montañas + estrellas.
+  // DARK MODE: fuerza noche profunda independiente de la hora.
+  // Mantiene posición del astro (viene de real hour); cambia paleta a night deep.
   p.top    = '#020617';
   p.mid1   = '#0c1a3e';
   p.mid2   = '#1e1b4b';
   p.bottom = '#312e81';
   p.stars  = 1;
-  p.glow   = 0.15;
-  p.mtnBack  = 0.6;
-  p.mtnMid   = 0.8;
-  p.mtnFront = 0.95;
-  // El astro sigue en su posición REAL; cambiamos su color a algo lunar.
-  p.astro = '#f1f5f9';
-  p.craters = true;
+  p.glow   = 0.1;
+  p.mtnBack  = 0.75;
+  p.mtnMid   = 0.9;
+  p.mtnFront = 1;
+  p.astro    = '#f1f5f9';
+  p.craters  = true;
 };
 
 const applyPhase = () => {
