@@ -122,12 +122,15 @@ const emojis = ['❤️','🔥','👏','🤔','😂','🎉'];
       });
     });
 
-    // Recarga cuando cambia la nota abierta (evento del viewer)
+    // Recarga cuando cambia la nota abierta (evento del viewer).
+    // Cualquier instancia de Reacciones puede escuchar; solo se actualiza
+    // si el slug del evento es distinto del que ya tiene.
     document.addEventListener('note:changed', (ev) => {
       const slug = ev?.detail?.slug;
-      if (!slug || root.dataset.dynamic !== 'true') return;
+      if (!slug || slug === currentSlug) return;
       currentSlug = slug;
       root.dataset.slug = slug;
+      console.log('[reacciones] note:changed → slug =', slug);
       load();
     });
 

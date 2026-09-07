@@ -228,6 +228,7 @@ const openNote = (slug: string) => {
   // Scroll al principio y notificar a Reacciones/Comentarios para que recarguen
   const winBody = noteWin.querySelector<HTMLElement>('.win-body');
   if (winBody) winBody.scrollTop = 0;
+  console.log('[desktop] openNote →', slug, 'dispatching note:changed');
   document.dispatchEvent(new CustomEvent('note:changed', { detail: { slug } }));
 };
 

@@ -26,13 +26,6 @@ const notas = (await getCollection('notas')).filter((n) => !n.data.draft);
   </article>
 </Window>
 
-<!-- Marca los reacciones/comentarios dentro del viewer como "dinámicos" para
-     que reaccionen al evento note:changed en vez de cargar al inicio. -->
-<script>
-  document.querySelectorAll('[data-window="note"] [data-reacciones], [data-window="note"] [data-comentarios]')
-    .forEach((el) => { el.dataset.dynamic = 'true'; });
-</script>
-
 <!-- Plantillas con el contenido de cada nota (una por nota, oculta hasta pedirla) -->
 {notas.length > 0 && (
   <div style="display: none;">

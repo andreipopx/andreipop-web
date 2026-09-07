@@ -192,10 +192,11 @@ const { slug } = Astro.props;
     // Recarga cuando cambia la nota abierta
     document.addEventListener('note:changed', (ev) => {
       const slug = ev?.detail?.slug;
-      if (!slug || root.dataset.dynamic !== 'true') return;
+      if (!slug || slug === currentSlug) return;
       currentSlug = slug;
       root.dataset.slug = slug;
       if (msgEl) msgEl.textContent = '';
+      console.log('[comentarios] note:changed → slug =', slug);
       load();
     });
 
