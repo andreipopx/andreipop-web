@@ -2,7 +2,7 @@
 import Window from './Window.astro';
 import { site } from '../../config/site';
 ---
-<Window slug="firma" title="Firma — guestbook" x={220} y={130} width={520} height={620} z={100}>
+<Window slug="firma" title="Firma — guestbook" x={220} y={130} width={540} height={640} z={100}>
   <div style="display: flex; flex-direction: column; height: 100%;">
 
     <!-- Form -->
@@ -19,10 +19,15 @@ import { site } from '../../config/site';
         name="mensaje" placeholder="Un mensaje (max 500 caracteres)" required maxlength="500" rows="3"
         style="padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-ink); font-family: inherit; font-size: 14px; resize: vertical; outline: none;"
       ></textarea>
-      <div class="cf-turnstile" data-sitekey={site.api.turnstileSiteKey} data-theme="auto" data-size="flexible"></div>
+      <!-- Turnstile widget renderizado con explicit callback -->
+      <div data-turnstile-container style="min-height: 65px; display: flex; align-items: center; justify-content: center;">
+        <div style="font-size: 12px; color: var(--color-muted);" data-turnstile-status>Cargando verificación…</div>
+      </div>
       <button
         type="submit"
-        style="padding: 10px 16px; background: var(--color-indigo); color: #fff; border: none; border-radius: 999px; font-size: 14px; font-weight: 500; cursor: pointer;"
+        data-firma-submit
+        disabled
+        style="padding: 10px 16px; background: var(--color-indigo); color: #fff; border: none; border-radius: 999px; font-size: 14px; font-weight: 500; cursor: pointer; opacity: 0.6;"
       >
         Firmar
       </button>
@@ -40,16 +45,67 @@ import { site } from '../../config/site';
   </div>
 </Window>
 
-<script define:vars={{ API: site.api.baseUrl }}>
+<script define:vars={{ API: site.api.baseUrl, SITE_KEY: site.api.turnstileSiteKey }}>
   const win = document.querySelector('[data-window="firma"]');
   if (win) {
-    const listEl  = win.querySelector('[data-firmas-list]');
-    const countEl = win.querySelector('[data-firma-count]');
-    const form    = win.querySelector('[data-firma-form]');
-    const msgEl   = win.querySelector('[data-firma-msg]');
+    const listEl    = win.querySelector('[data-firmas-list]');
+    const countEl   = win.querySelector('[data-firma-count]');
+    const form      = win.querySelector('[data-firma-form]');
+    const msgEl     = win.querySelector('[data-firma-msg]');
+    const submitBtn = win.querySelector('[data-firma-submit]');
+    const container = win.querySelector('[data-turnstile-container]');
+    const statusEl  = win.querySelector('[data-turnstile-status]');
+
+    let currentToken = null;
+    let widgetId = null;
 
     const fmt = (iso) => new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '');
     const escape = (s) => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const enableSubmit = () => {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
+    };
+    const disableSubmit = () => {
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.6'; }
+    };
+
+    const renderTurnstile = () => {
+      if (!window.turnstile || !container) return;
+      // Limpia el placeholder
+      container.innerHTML = '';
+      widgetId = window.turnstile.render(container, {
+        sitekey: SITE_KEY,
+        theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
+        callback: (token) => {
+          currentToken = token;
+          enableSubmit();
+          if (statusEl) statusEl.textContent = '';
+        },
+        'expired-callback': () => {
+          currentToken = null;
+          disableSubmit();
+        },
+        'error-callback': () => {
+          currentToken = null;
+          disableSubmit();
+          if (msgEl) msgEl.textContent = 'Error de verificación. Refresca la página.';
+        },
+      });
+    };
+
+    // Turnstile puede cargar antes o después de este script — cubrimos ambos casos
+    const waitForTurnstile = () => {
+      if (window.turnstile) { renderTurnstile(); return; }
+      let tries = 0;
+      const iv = setInterval(() => {
+        if (window.turnstile || tries++ > 50) {
+          clearInterval(iv);
+          if (window.turnstile) renderTurnstile();
+          else if (statusEl) statusEl.textContent = 'No se pudo cargar la verificación anti-bot.';
+        }
+      }, 200);
+    };
+    waitForTurnstile();
 
     const render = (firmas) => {
       if (countEl) countEl.textContent = String(firmas.length);
@@ -84,30 +140,33 @@ import { site } from '../../config/site';
       const fd = new FormData(form);
       const nombre  = fd.get('nombre');
       const mensaje = fd.get('mensaje');
-      const token   = fd.get('cf-turnstile-response');
-      if (!token) {
-        if (msgEl) msgEl.textContent = 'Espera a que el widget de verificación cargue.';
+      if (!currentToken) {
+        if (msgEl) msgEl.textContent = 'Aún no se ha completado la verificación anti-bot. Espera un segundo.';
         return;
       }
+      disableSubmit();
       if (msgEl) msgEl.textContent = 'Enviando…';
       try {
         const r = await fetch(`${API}/firmas`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombre, mensaje, token }),
+          body: JSON.stringify({ nombre, mensaje, token: currentToken }),
         });
         const data = await r.json();
         if (!r.ok) {
           if (msgEl) msgEl.textContent = data.error || 'Error al firmar.';
-          window.turnstile?.reset();
+          currentToken = null;
+          if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
           return;
         }
-        if (msgEl) msgEl.textContent = 'Gracias por firmar ✓';
+        if (msgEl) msgEl.textContent = '✓ Gracias por firmar';
         form.reset();
-        window.turnstile?.reset();
+        currentToken = null;
+        if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
         load();
       } catch {
         if (msgEl) msgEl.textContent = 'No se pudo enviar. Intenta de nuevo.';
+        enableSubmit();
       }
     });
 
