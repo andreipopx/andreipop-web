@@ -277,18 +277,22 @@
    ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
+  html, body { height: 100dvh; overflow: hidden; }
   .menu-bar { padding: 0 12px; font-size: 11px; }
   .menu-bar > div:first-child > *:not(:first-child) { display: none; }
-  .dock { gap: 12px; padding: 6px 12px; bottom: 16px; }
+  .dock { gap: 12px; padding: 6px 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
   .app-icon { width: 44px; height: 44px; border-radius: 12px; }
   .app-icon:hover { transform: none; }
   .app-icon-label { display: none; }
   .win {
     top: 44px !important; left: 12px !important;
-    width: calc(100vw - 24px) !important; height: calc(100vh - 130px) !important;
+    width: calc(100vw - 24px) !important;
+    height: calc(100dvh - 180px) !important;
+    max-height: calc(100dvh - 180px) !important;
     max-width: none;
     animation: winOpenMobile 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
+  .win-body { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
   .win-bar { cursor: default; }
   .win-resize { display: none; }
   @keyframes winOpenMobile {
@@ -541,8 +545,8 @@
   }
   .app-icon-label::after { display: none; }
   /* Dock con espacio inferior para acomodar los labels */
-  .dock { bottom: 28px; padding-bottom: 22px; }
-  .dock-overflow { bottom: 106px; padding-bottom: 22px; }
+  .dock { bottom: calc(28px + env(safe-area-inset-bottom, 0px)); padding-bottom: 22px; }
+  .dock-overflow { bottom: calc(106px + env(safe-area-inset-bottom, 0px)); padding-bottom: 22px; }
   /* Botón "more" ligeramente más pequeño para coincidir */
   .dock-more { width: 44px; height: 44px; }
 }
