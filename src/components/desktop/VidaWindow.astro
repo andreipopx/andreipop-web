@@ -1,0 +1,30 @@
+---
+import Window from './Window.astro';
+import { getCollection, render } from 'astro:content';
+
+const entries = await getCollection('vida');
+const entry = entries.find((e) => e.id === 'index') ?? entries[0];
+const { Content } = entry ? await render(entry) : { Content: null };
+const updated = entry?.data.updated;
+---
+<Window slug="vida" title="Vida — ahora" x={340} y={120} width={560} height={540} z={100}>
+  <div style="padding: 28px 32px; max-width: 560px;">
+    {updated && (
+      <div class="mono cap" style="margin-bottom: 16px;">
+        Actualizado {updated.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
+      </div>
+    )}
+    <div style="font-size: 15px; line-height: 1.7; color: #1a1c22;">
+      {Content && <Content />}
+    </div>
+  </div>
+</Window>
+
+<style is:global>
+  [data-window="vida"] .win-body h2 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; letter-spacing: -0.01em; color: #0f1115; }
+  [data-window="vida"] .win-body h2:first-child { margin-top: 0; }
+  [data-window="vida"] .win-body ul { padding-left: 20px; margin: 8px 0; }
+  [data-window="vida"] .win-body li { margin: 4px 0; }
+  [data-window="vida"] .win-body p { margin: 8px 0; }
+  [data-window="vida"] .win-body em { color: #6b7280; }
+</style>

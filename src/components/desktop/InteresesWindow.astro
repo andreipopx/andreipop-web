@@ -1,0 +1,138 @@
+---
+import Window from './Window.astro';
+import enlaces from '../../data/enlaces.json';
+import libros from '../../data/libros.json';
+import musica from '../../data/musica.json';
+import peliculas from '../../data/peliculas.json';
+import quotes from '../../data/quotes.json';
+
+const tabs = [
+  { id: 'enlaces',   label: 'Enlaces',    count: enlaces.length },
+  { id: 'libros',    label: 'Libros',     count: libros.length },
+  { id: 'musica',    label: 'Música',     count: musica.length },
+  { id: 'peliculas', label: 'Películas',  count: peliculas.length },
+  { id: 'quotes',    label: 'Quotes',     count: quotes.length },
+];
+---
+<Window slug="intereses" title="Intereses" x={280} y={100} width={640} height={520} z={100}>
+  <div style="display: flex; flex-direction: column; height: 100%;">
+    <!-- tabs -->
+    <div style="display: flex; gap: 4px; padding: 8px 12px 0; border-bottom: 1px solid #eaecef; flex-shrink: 0; overflow-x: auto;">
+      {tabs.map((t, i) => (
+        <button
+          type="button"
+          data-int-tab={t.id}
+          class:list={['int-tab']}
+          style={`padding: 8px 14px; border: none; background: transparent; font-size: 13px; font-weight: 500; color: ${i === 0 ? '#0f1115' : '#6b7280'}; border-bottom: 2px solid ${i === 0 ? '#1e3a8a' : 'transparent'}; cursor: pointer; white-space: nowrap;`}
+          data-active={i === 0 ? 'true' : 'false'}
+        >
+          {t.label} <span class="mono" style="font-size: 10px; opacity: 0.6;">{t.count}</span>
+        </button>
+      ))}
+    </div>
+
+    <!-- panels -->
+    <div style="flex: 1; overflow-y: auto;">
+
+      <div data-int-panel="enlaces" style="padding: 12px;">
+        {enlaces.length === 0 ? (
+          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin enlaces.</p>
+        ) : (
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            {enlaces.map((e: any) => (
+              <li style="padding: 12px; border-bottom: 1px solid #f3f4f6;">
+                <a href={e.url} target="_blank" rel="noopener" style="color: #1e3a8a; font-weight: 500; font-size: 14px;">{e.title} ↗</a>
+                {e.source && <span style="font-size: 12px; color: #6b7280; margin-left: 8px;">— {e.source}</span>}
+                {e.note && <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0;">{e.note}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div data-int-panel="libros" hidden style="padding: 12px;">
+        {libros.length === 0 ? (
+          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin libros.</p>
+        ) : (
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            {libros.map((l: any) => (
+              <li style="padding: 12px; border-bottom: 1px solid #f3f4f6; display: flex; gap: 12px; align-items: baseline;">
+                <span class="mono" style="font-size: 10px; padding: 2px 8px; background: #f3f4f6; color: #4b5563; border-radius: 999px; text-transform: uppercase;">{l.status}</span>
+                <div style="flex: 1;">
+                  <div style="font-weight: 500; font-size: 14px;">{l.title}</div>
+                  <div style="font-size: 12px; color: #6b7280;">{l.author}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div data-int-panel="musica" hidden style="padding: 12px;">
+        {musica.length === 0 ? (
+          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin música.</p>
+        ) : (
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            {musica.map((m: any) => (
+              <li style="padding: 12px; border-bottom: 1px solid #f3f4f6;">
+                <div style="font-weight: 500; font-size: 14px;">{m.title}</div>
+                <div style="font-size: 12px; color: #6b7280;">{m.artist} · {m.year}</div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div data-int-panel="peliculas" hidden style="padding: 12px;">
+        {peliculas.length === 0 ? (
+          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin películas.</p>
+        ) : (
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            {peliculas.map((p: any) => (
+              <li style="padding: 12px; border-bottom: 1px solid #f3f4f6;">
+                <div style="font-weight: 500; font-size: 14px;">{p.title}</div>
+                <div style="font-size: 12px; color: #6b7280;">{p.director} · {p.year}</div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div data-int-panel="quotes" hidden style="padding: 12px;">
+        {quotes.length === 0 ? (
+          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin quotes.</p>
+        ) : (
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            {quotes.map((q: any) => (
+              <li style="padding: 16px 12px; border-bottom: 1px solid #f3f4f6;">
+                <p style="font-size: 15px; font-style: italic; color: #0f1115; margin: 0; line-height: 1.55;">"{q.text}"</p>
+                <p style="font-size: 12px; color: #6b7280; margin: 8px 0 0;">— {q.author}{q.source && `, ${q.source}`}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+    </div>
+  </div>
+</Window>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-window="intereses"]').forEach((win) => {
+    const tabs = win.querySelectorAll<HTMLButtonElement>('[data-int-tab]');
+    const panels = win.querySelectorAll<HTMLElement>('[data-int-panel]');
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-int-tab');
+        tabs.forEach((t) => {
+          const active = t === tab;
+          t.style.color = active ? '#0f1115' : '#6b7280';
+          t.style.borderBottomColor = active ? '#1e3a8a' : 'transparent';
+        });
+        panels.forEach((p) => {
+          p.hidden = p.getAttribute('data-int-panel') !== target;
+        });
+      });
+    });
+  });
+</script>

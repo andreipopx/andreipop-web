@@ -1,0 +1,14 @@
+---
+import { site } from '../../config/site';
+import AppIcon from './AppIcon.astro';
+
+const primary = site.apps.filter((a) => a.slug !== 'contacto');
+const contacto = site.apps.find((a) => a.slug === 'contacto')!;
+---
+<nav class="dock" aria-label="Dock">
+  {primary.map((app) => (
+    <AppIcon slug={app.slug} label={app.label} accent={app.accent} icon={app.icon} />
+  ))}
+  <div class="dock-sep" aria-hidden="true"></div>
+  <AppIcon slug={contacto.slug} label={contacto.label} accent={contacto.accent} icon={contacto.icon} />
+</nav>

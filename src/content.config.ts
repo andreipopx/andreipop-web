@@ -1,53 +1,41 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-const post = z.object({
-  title: z.string(),
-  date: z.date(),
-  excerpt: z.string().optional(),
-  cover: z.string().optional(),
-  draft: z.boolean().default(false),
-});
-
-const viajes = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/viajes' }),
-  schema: post,
-});
-
-const reflexiones = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/reflexiones' }),
-  schema: post,
-});
-
-const papers = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/papers' }),
-  schema: post.extend({
-    venue: z.string().optional(),
-    authors: z.array(z.string()).optional(),
-    url: z.string().url().optional(),
+const notas = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/notas' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.date(),
+    kind: z.enum(['nota', 'ensayo', 'paper']).default('nota'),
+    excerpt: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
   }),
 });
 
-const enlaces = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/enlaces' }),
-  schema: post.extend({
-    url: z.string().url(),
-    source: z.string().optional(),
-  }),
-});
-
-const proyectos = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/proyectos' }),
+const cosas = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/cosas' }),
   schema: z.object({
     title: z.string(),
     tagline: z.string(),
     year: z.number(),
+    kind: z.enum(['proyecto', 'paper', 'charla', 'otro']).default('proyecto'),
     accent: z.enum(['indigo', 'orange', 'emerald', 'violet', 'amber']).default('indigo'),
     initial: z.string().length(1),
     url: z.string().url().optional(),
+    repo: z.string().url().optional(),
+    tags: z.array(z.string()).default([]),
     order: z.number().default(0),
     draft: z.boolean().default(false),
   }),
 });
 
-export const collections = { viajes, reflexiones, papers, enlaces, proyectos };
+const vida = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/vida' }),
+  schema: z.object({
+    title: z.string().default('Ahora'),
+    updated: z.date(),
+  }),
+});
+
+export const collections = { notas, cosas, vida };

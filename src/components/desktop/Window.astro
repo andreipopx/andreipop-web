@@ -1,0 +1,41 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  z?: number;
+  open?: boolean;
+}
+const {
+  slug,
+  title,
+  x = 120,
+  y = 80,
+  width = 520,
+  height = 480,
+  z = 100,
+  open = false,
+} = Astro.props;
+---
+<article
+  class="win"
+  data-window={slug}
+  hidden={!open}
+  style={`left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; z-index: ${z};`}
+>
+  <header class="win-bar" data-drag-handle>
+    <div class="tl">
+      <button type="button" class="tl-close" aria-label="Cerrar" data-action="close"></button>
+      <button type="button" class="tl-min"   aria-label="Minimizar" data-action="min"></button>
+      <button type="button" class="tl-max"   aria-label="Maximizar" data-action="max"></button>
+    </div>
+    <div class="win-title">{title}</div>
+    <div style="width: 46px;" aria-hidden="true"></div>
+  </header>
+  <div class="win-body">
+    <slot />
+  </div>
+</article>

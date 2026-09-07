@@ -1,15 +1,11 @@
 ---
 import '../styles/global.css';
-import Grain from '../components/Grain.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
 import { site } from '../config/site';
 
 interface Props {
   title?: string;
   description?: string;
 }
-
 const { title, description = site.bio } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.name;
 ---
@@ -17,30 +13,21 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={`${site.domain}${Astro.url.pathname}`} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="alternate" type="application/rss+xml" title={site.name} href="/feed.xml" />
   </head>
   <body>
-    <Grain />
-    <div class="relative z-[1] flex min-h-screen flex-col">
-      <Header />
-      <main class="flex-1">
-        <slot />
-      </main>
-      <Footer />
-    </div>
+    <slot />
   </body>
 </html>

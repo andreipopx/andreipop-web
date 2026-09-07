@@ -1,0 +1,44 @@
+---
+import Window from './Window.astro';
+import { getCollection } from 'astro:content';
+
+const notas = (await getCollection('notas'))
+  .filter((n) => !n.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '');
+---
+<Window slug="notas" title={`Notas — ${notas.length} entrada${notas.length === 1 ? '' : 's'}`} x={80} y={110} width={640} height={560} z={100}>
+  {notas.length === 0 ? (
+    <div style="padding: 48px 32px; text-align: center;">
+      <div class="cap" style="margin-bottom: 12px;">Notas</div>
+      <div style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px;">Todavía no hay notas.</div>
+      <p style="font-size: 14px; color: #6b7280; margin: 0;">Cuando escriba algo aparecerá aquí.</p>
+    </div>
+  ) : (
+    <ul style="list-style: none; padding: 8px; margin: 0;">
+      {notas.map((n) => (
+        <li>
+          <a href={`/notas/${n.id}/`} style="display: grid; grid-template-columns: 100px 1fr auto; gap: 16px; align-items: baseline; padding: 14px 16px; border-radius: 8px;">
+            <div class="mono" style="font-size: 11px; color: #6b7280; text-transform: uppercase;">{fmt(n.data.date)}</div>
+            <div style="min-width: 0;">
+              <div style="font-size: 16px; font-weight: 500; letter-spacing: -0.01em; color: #0f1115;">{n.data.title}</div>
+              {n.data.excerpt && (
+                <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">{n.data.excerpt}</div>
+              )}
+              {n.data.tags.length > 0 && (
+                <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+                  {n.data.tags.map((t) => (
+                    <span class="mono" style="font-size: 10px; padding: 2px 8px; background: #eef2ff; color: #1e3a8a; border-radius: 999px;">#{t}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div class="cap" style="color: #1e3a8a;">{n.data.kind === 'paper' ? 'Paper' : n.data.kind === 'ensayo' ? 'Ensayo' : 'Nota'}</div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</Window>

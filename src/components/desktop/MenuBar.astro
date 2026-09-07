@@ -1,0 +1,36 @@
+---
+import { site } from '../../config/site';
+---
+<div class="menu-bar mono">
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <span style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 L14 8 L20 8 L15 12 L17 18 L12 15 L7 18 L9 12 L4 8 L10 8 Z"/></svg>
+      {site.name}
+    </span>
+    <span style="opacity: 0.65;">Home</span>
+    <span style="opacity: 0.65;">Ver</span>
+    <span style="opacity: 0.65;">Ayuda</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <span data-clock style="font-weight: 500;">— · —:—</span>
+  </div>
+</div>
+
+<script>
+  const el = document.querySelector<HTMLElement>('[data-clock]');
+  if (el) {
+    const dias = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+    const meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+    const tick = () => {
+      const now = new Date();
+      const d = dias[now.getDay()];
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = meses[now.getMonth()];
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mn = String(now.getMinutes()).padStart(2, '0');
+      el.textContent = `${d} ${dd} ${mm} · ${hh}:${mn}`;
+    };
+    tick();
+    setInterval(tick, 15000);
+  }
+</script>
