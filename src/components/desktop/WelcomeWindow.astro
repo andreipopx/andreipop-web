@@ -4,13 +4,13 @@ import { site } from '../../config/site';
 ---
 <Window slug="welcome" title="hola.txt — andreipop.org" x={120} y={80} width={540} height={420} z={110} open={true}>
   <div style="padding: 32px 32px 28px;">
-    <h1 style="font-size: 56px; font-weight: 700; line-height: 1.02; letter-spacing: -0.035em; margin: 0;">
+    <h1 style="font-size: 56px; font-weight: 700; line-height: 1.02; letter-spacing: -0.035em; margin: 0; color: var(--color-ink);">
       {site.hero.salutation} <span style="color: var(--color-indigo);">{site.hero.name}</span>.<br />{site.hero.kicker}
     </h1>
-    <p style="margin: 20px 0 0; font-size: 15px; line-height: 1.55; color: #374151; max-width: 380px;">
+    <p style="margin: 20px 0 0; font-size: 15px; line-height: 1.55; color: var(--color-body); max-width: 380px;">
       {site.bio}
     </p>
-    <div class="mono" style="margin-top: 20px; font-size: 11px; color: #6b7280; display: flex; align-items: center; gap: 8px;">
+    <div class="mono" style="margin-top: 20px; font-size: 11px; color: var(--color-muted); display: flex; align-items: center; gap: 8px;">
       <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
       abre las apps del dock para explorar
     </div>

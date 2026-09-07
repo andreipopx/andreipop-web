@@ -212,10 +212,14 @@ allWindows().forEach((w) => {
     const onMove = (ev: MouseEvent) => {
       const nx = startLeft + (ev.clientX - startX);
       const ny = startTop  + (ev.clientY - startY);
-      const maxX = window.innerWidth - w.offsetWidth - 20;
-      const maxY = window.innerHeight - w.offsetHeight - DOCK_H_RESERVED;
-      w.style.left = `${Math.max(20, Math.min(maxX, nx))}px`;
-      w.style.top  = `${Math.max(MENU_BAR_H + 10, Math.min(maxY, ny))}px`;
+      // Los bounds ahora son laxos: sólo garantizamos que la title bar
+      // siga siendo agarrable (no fuera del viewport), y que la ventana
+      // no se meta bajo el dock. Puede pasar por detrás del menu bar.
+      const maxX = window.innerWidth - 60;
+      const minX = -w.offsetWidth + 100;
+      const maxY = window.innerHeight - DOCK_H_RESERVED - 10;
+      w.style.left = `${Math.max(minX, Math.min(maxX, nx))}px`;
+      w.style.top  = `${Math.max(0, Math.min(maxY, ny))}px`;
     };
     const onUp = () => {
       document.removeEventListener('mousemove', onMove);
@@ -284,6 +288,7 @@ const toggleTheme = () => {
   document.documentElement.dataset.theme = next;
   localStorage.setItem('theme', next);
   updateThemeUI(next);
+  applyPhase(); // wallpaper también responde al toggle
 };
 
 // ─── cursor personalizado toggle ────────────────────────────
@@ -375,7 +380,14 @@ const phaseAt = (hour: number): PhaseColors => {
 };
 
 const applyPhase = () => {
-  const p = phaseAt(new Date().getHours());
+  // Si el usuario ha forzado modo oscuro, mostramos siempre la fase nocturna.
+  // Modo claro deja al reloj decidir (con la excepción de que si es de noche,
+  // mostramos la fase de anochecer como compromiso).
+  const theme = document.documentElement.dataset.theme as 'light' | 'dark';
+  let hour = new Date().getHours();
+  if (theme === 'dark') hour = 23;
+  else if (theme === 'light' && (hour >= 22 || hour < 5)) hour = 12;
+  const p = phaseAt(hour);
   const wp = document.querySelector('[data-wallpaper]');
   if (!wp) return;
   const setStop = (name: string, color: string) => {

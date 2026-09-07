@@ -363,3 +363,68 @@
 /* Menu brand hover suave */
 .menu-brand:hover { opacity: 1 !important; background: rgba(0,0,0,0.06); }
 :root[data-theme='dark'] .menu-brand:hover { background: rgba(255,255,255,0.08); }
+
+/* ─────────────────────────────────────────────────────────────
+   Round 3 fixes
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --color-body: #374151;
+}
+:root[data-theme='dark'] {
+  --color-body: #d1d5db;
+}
+
+/* App icon: dejar overflow visible para que el tooltip se vea */
+.app-icon { overflow: visible; }
+
+/* Traffic lights hitbox más grande (pero mismos círculos visualmente) */
+.tl { gap: 8px; padding: 6px 4px; margin: -6px -4px; }
+.tl > button { width: 12px; height: 12px; }
+.tl > button::after,
+.tl > button::before { inset: 0; }
+/* Hitbox invisible ampliada alrededor del círculo */
+.tl > button {
+  outline: 8px solid transparent;
+  outline-offset: -6px;
+}
+
+/* Contraste win-body en dark: fuerza color legible en párrafos que no lo definan */
+:root[data-theme='dark'] .win-body p,
+:root[data-theme='dark'] .win-body li,
+:root[data-theme='dark'] .win-body div:not([class]) {
+  color: var(--color-ink);
+}
+
+/* Cursor personalizado - flecha limpia estilo macOS */
+:root[data-cursor='custom'] body,
+:root[data-cursor='custom'] .win-body,
+:root[data-cursor='custom'] .menu-bar,
+:root[data-cursor='custom'] .win {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 20 24'><path d='M2 2 L2 20 L7 15 L10 22 L13 21 L10 14 L17 14 Z' fill='%23fafafa' stroke='%230f1115' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round'/></svg>") 2 2, default;
+}
+:root[data-cursor='custom'][data-theme='dark'] body,
+:root[data-cursor='custom'][data-theme='dark'] .win-body,
+:root[data-cursor='custom'][data-theme='dark'] .menu-bar,
+:root[data-cursor='custom'][data-theme='dark'] .win {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 20 24'><path d='M2 2 L2 20 L7 15 L10 22 L13 21 L10 14 L17 14 Z' fill='%230f1115' stroke='%23fafafa' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round'/></svg>") 2 2, default;
+}
+/* Para interactivos usamos el system pointer (más fiable) */
+:root[data-cursor='custom'] a,
+:root[data-cursor='custom'] button,
+:root[data-cursor='custom'] .app-icon,
+:root[data-cursor='custom'] .menu-item,
+:root[data-cursor='custom'] [data-menu-action] {
+  cursor: pointer;
+}
+:root[data-cursor='custom'] [data-drag-handle] { cursor: grab; }
+:root[data-cursor='custom'] [data-drag-handle]:active { cursor: grabbing; }
+:root[data-cursor='custom'] [data-resize] { cursor: inherit; }
+:root[data-cursor='custom'] .win-resize.n,
+:root[data-cursor='custom'] .win-resize.s { cursor: ns-resize; }
+:root[data-cursor='custom'] .win-resize.e,
+:root[data-cursor='custom'] .win-resize.w { cursor: ew-resize; }
+:root[data-cursor='custom'] .win-resize.ne,
+:root[data-cursor='custom'] .win-resize.sw { cursor: nesw-resize; }
+:root[data-cursor='custom'] .win-resize.nw,
+:root[data-cursor='custom'] .win-resize.se { cursor: nwse-resize; }
