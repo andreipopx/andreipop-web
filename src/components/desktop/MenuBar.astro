@@ -3,45 +3,72 @@ import { site } from '../../config/site';
 ---
 <div class="menu-bar mono">
   <div style="display: flex; align-items: center; gap: 8px;">
-    <span style="display: flex; align-items: center; gap: 6px; font-weight: 600; padding: 0 6px;">
+    <button
+      class="menu-item menu-brand"
+      data-menu-action="open-welcome"
+      style="display: flex; align-items: center; gap: 6px; font-weight: 600; padding: 4px 6px; opacity: 1;"
+      aria-label="Volver a la ventana de inicio"
+    >
       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 L14 8 L20 8 L15 12 L17 18 L12 15 L7 18 L9 12 L4 8 L10 8 Z"/></svg>
-      {site.name}
-    </span>
+      <span data-brand-full>{site.name}</span>
+      <span data-brand-short hidden>ap</span>
+    </button>
 
     <div style="position: relative;">
-      <button class="menu-item" data-menu="home" aria-haspopup="true" aria-expanded="false">Home</button>
+      <button class="menu-item" data-menu="home" aria-haspopup="true" aria-expanded="false">
+        <span data-full>Home</span>
+        <svg data-short hidden width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h4v-6h6v6h4V10"/></svg>
+      </button>
       <div class="menu-dropdown" data-menu-panel="home" hidden>
-        <button data-menu-action="reset">Volver al inicio</button>
+        <button data-menu-action="open-welcome">Sobre esta web</button>
+        <button data-menu-action="reset">Volver al inicio (cerrar todo)</button>
         <button data-menu-action="close-all">Cerrar todas las ventanas</button>
         <hr />
         <a href="https://github.com/andreipopx/andreipop-web" target="_blank" rel="noopener">Ver código en GitHub ↗</a>
+        <a href="/rss.xml">Suscribirse por RSS</a>
       </div>
     </div>
 
     <div style="position: relative;">
-      <button class="menu-item" data-menu="ver" aria-haspopup="true" aria-expanded="false">Ver</button>
+      <button class="menu-item" data-menu="ver" aria-haspopup="true" aria-expanded="false">
+        <span data-full>Ver</span>
+        <svg data-short hidden width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/></svg>
+      </button>
       <div class="menu-dropdown" data-menu-panel="ver" hidden>
         <button data-menu-action="toggle-theme">
           <span>Cambiar modo</span>
           <kbd>⌘ D</kbd>
         </button>
-        <button data-menu-action="center-all">
-          <span>Centrar ventanas abiertas</span>
-        </button>
+        <button data-menu-action="center-all">Centrar ventanas abiertas</button>
+        <button data-menu-action="tile">Ordenar ventanas en cuadrícula</button>
+        <hr />
+        <button data-menu-action="toggle-cursor">Cursor personalizado</button>
       </div>
     </div>
 
     <div style="position: relative;">
-      <button class="menu-item" data-menu="ayuda" aria-haspopup="true" aria-expanded="false">Ayuda</button>
+      <button class="menu-item" data-menu="ayuda" aria-haspopup="true" aria-expanded="false">
+        <span data-full>Ayuda</span>
+        <svg data-short hidden width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 4"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>
+      </button>
       <div class="menu-dropdown" data-menu-panel="ayuda" hidden>
         <button data-menu-action="open-welcome">Sobre esta web</button>
-        <hr />
         <button data-menu-action="show-shortcuts">Atajos de teclado</button>
+        <hr />
+        <a href="https://github.com/andreipopx/andreipop-web/issues" target="_blank" rel="noopener">Reportar un problema ↗</a>
       </div>
     </div>
   </div>
 
   <div style="display: flex; align-items: center; gap: 12px;">
+    <span data-battery hidden style="display: flex; align-items: center; gap: 4px; font-size: 11px; opacity: 0.75;">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="0.5" y="0.5" width="14" height="11" rx="1.5"/>
+        <rect data-battery-fill x="2" y="2" width="0" height="8" rx="0.5" fill="currentColor" stroke="none"/>
+        <rect x="15" y="4" width="2" height="4" rx="0.5" fill="currentColor" stroke="none"/>
+      </svg>
+      <span data-battery-pct>—</span>
+    </span>
     <button
       class="menu-item"
       data-menu-action="toggle-theme"

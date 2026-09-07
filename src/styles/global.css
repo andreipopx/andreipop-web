@@ -296,3 +296,70 @@
     100% { opacity: 1; transform: translateY(0); }
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Round 2 additions
+   ───────────────────────────────────────────────────────────── */
+
+/* Minimize animation (efecto genie hacia el dock) */
+.win.minimizing {
+  animation: winMinimize 0.26s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  pointer-events: none;
+}
+@keyframes winMinimize {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--min-dx, 0), var(--min-dy, 0)) scale(0.05); }
+}
+
+/* Tooltip mejor sobre el dock */
+.app-icon-label {
+  bottom: auto !important;
+  top: -30px;
+  padding: 4px 10px;
+  background: rgba(15,17,21,0.85);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-radius: 6px;
+  color: #fff !important;
+  text-shadow: none !important;
+  font-size: 11px !important;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: opacity 0.15s ease-out 0.3s, transform 0.15s ease-out 0.3s !important;
+  transform: translateX(-50%) translateY(4px);
+}
+.app-icon:hover .app-icon-label {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0);
+}
+.app-icon-label::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%; transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: rgba(15,17,21,0.85);
+}
+
+/* Cursor personalizado (activo cuando data-cursor="custom") */
+:root[data-cursor='custom'] body,
+:root[data-cursor='custom'] .win-body,
+:root[data-cursor='custom'] .menu-bar {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='24' viewBox='0 0 16 24'><path d='M1 1 L1 18 L5 14 L8 22 L11 21 L8 13 L14 13 Z' fill='%230f1115' stroke='%23fff' stroke-width='1.2' stroke-linejoin='round'/></svg>") 1 1, default;
+}
+:root[data-cursor='custom'][data-theme='dark'] body,
+:root[data-cursor='custom'][data-theme='dark'] .win-body,
+:root[data-cursor='custom'][data-theme='dark'] .menu-bar {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='24' viewBox='0 0 16 24'><path d='M1 1 L1 18 L5 14 L8 22 L11 21 L8 13 L14 13 Z' fill='%23fff' stroke='%230f1115' stroke-width='1.2' stroke-linejoin='round'/></svg>") 1 1, default;
+}
+:root[data-cursor='custom'] a,
+:root[data-cursor='custom'] button,
+:root[data-cursor='custom'] .app-icon,
+:root[data-cursor='custom'] .menu-item,
+:root[data-cursor='custom'] [data-menu-action] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='24' viewBox='0 0 20 24'><path d='M6 2 L6 10 L4 10 L4 14 L2 12 L2 16 L6 20 L14 20 L16 14 L18 10 L16 8 L14 10 L14 4 L12 4 L12 8 L10 8 L10 2 Z' fill='%230f1115' stroke='%23fff' stroke-width='1.2' stroke-linejoin='round'/></svg>") 8 4, pointer;
+}
+:root[data-cursor='custom'] [data-drag-handle] { cursor: grab; }
+:root[data-cursor='custom'] [data-drag-handle]:active { cursor: grabbing; }
+
+/* Menu brand hover suave */
+.menu-brand:hover { opacity: 1 !important; background: rgba(0,0,0,0.06); }
+:root[data-theme='dark'] .menu-brand:hover { background: rgba(255,255,255,0.08); }
