@@ -50,9 +50,13 @@ const emojis = ['❤️','🔥','👏','🤔','😂','🎉'];
 
 <script define:vars={{ API: site.api.baseUrl }}>
   document.querySelectorAll('[data-reacciones]').forEach((root) => {
-    const slug = root.dataset.slug;
-    const storageKey = `rx:${slug}`;
-    const mine = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+    let currentSlug = root.dataset.slug || '';
+    let mine = new Set();
+
+    const readMine = () => {
+      try { mine = new Set(JSON.parse(localStorage.getItem(`rx:${currentSlug}`) || '[]')); }
+      catch { mine = new Set(); }
+    };
 
     const paintCounts = (cuentas) => {
       root.querySelectorAll('.rx-btn').forEach((btn) => {
@@ -65,21 +69,28 @@ const emojis = ['❤️','🔥','👏','🤔','😂','🎉'];
     };
 
     const load = async () => {
+      if (!currentSlug) return;
+      readMine();
+      // Limpia contadores mientras carga
+      root.querySelectorAll('.rx-count').forEach((el) => { el.textContent = '—'; });
       try {
-        const r = await fetch(`${API}/reacciones/${encodeURIComponent(slug)}`);
+        const r = await fetch(`${API}/reacciones/${encodeURIComponent(currentSlug)}`);
         const data = await r.json();
         paintCounts(data.cuentas || {});
-      } catch {}
+      } catch {
+        paintCounts({});
+      }
     };
 
     root.querySelectorAll('.rx-btn').forEach((btn) => {
       btn.addEventListener('click', async () => {
+        if (!currentSlug) return;
         const emoji = btn.dataset.emoji;
-        if (mine.has(emoji)) return; // El Worker limita a 1 por IP+slug+emoji/24h; evitamos el POST
+        if (mine.has(emoji)) return;
         btn.classList.add('pop');
         setTimeout(() => btn.classList.remove('pop'), 350);
         try {
-          const r = await fetch(`${API}/reacciones/${encodeURIComponent(slug)}`, {
+          const r = await fetch(`${API}/reacciones/${encodeURIComponent(currentSlug)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ emoji }),
@@ -87,13 +98,22 @@ const emojis = ['❤️','🔥','👏','🤔','😂','🎉'];
           const data = await r.json();
           if (r.ok) {
             mine.add(emoji);
-            localStorage.setItem(storageKey, JSON.stringify([...mine]));
+            localStorage.setItem(`rx:${currentSlug}`, JSON.stringify([...mine]));
             paintCounts(data.cuentas || {});
           }
         } catch {}
       });
     });
 
-    load();
+    // Recarga cuando cambia la nota abierta (evento del viewer)
+    document.addEventListener('note:changed', (ev) => {
+      const slug = ev?.detail?.slug;
+      if (!slug || root.dataset.dynamic !== 'true') return;
+      currentSlug = slug;
+      root.dataset.slug = slug;
+      load();
+    });
+
+    if (currentSlug) load();
   });
 </script>

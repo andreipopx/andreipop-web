@@ -1,5 +1,7 @@
 ---
 import Window from './Window.astro';
+import Reacciones from '../Reacciones.astro';
+import Comentarios from '../Comentarios.astro';
 import { getCollection, render } from 'astro:content';
 
 const notas = (await getCollection('notas')).filter((n) => !n.data.draft);
@@ -15,12 +17,21 @@ const notas = (await getCollection('notas')).filter((n) => !n.data.draft);
         <div class="note-tags" data-note-tags></div>
       </header>
       <div class="note-body" data-note-body></div>
-      <div class="note-footer">
-        <a data-note-permalink href="#" class="note-permalink">Abrir página completa · reacciones y comentarios →</a>
+
+      <div class="note-social">
+        <Reacciones slug="" />
+        <Comentarios slug="" />
       </div>
     </div>
   </article>
 </Window>
+
+<!-- Marca los reacciones/comentarios dentro del viewer como "dinámicos" para
+     que reaccionen al evento note:changed en vez de cargar al inicio. -->
+<script>
+  document.querySelectorAll('[data-window="note"] [data-reacciones], [data-window="note"] [data-comentarios]')
+    .forEach((el) => { el.dataset.dynamic = 'true'; });
+</script>
 
 <!-- Plantillas con el contenido de cada nota (una por nota, oculta hasta pedirla) -->
 {notas.length > 0 && (
@@ -74,11 +85,5 @@ const notas = (await getCollection('notas')).filter((n) => !n.data.draft);
     padding: 14px; border-radius: 8px; overflow-x: auto; margin: 16px 0;
   }
   [data-window="note"] .note-body pre code { background: none; padding: 0; }
-  [data-window="note"] .note-footer { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--color-border); }
-  [data-window="note"] .note-permalink {
-    font-size: 13px; color: var(--color-indigo); text-decoration: none;
-    display: inline-block; padding: 8px 0;
-    transition: transform 0.15s ease-out;
-  }
-  [data-window="note"] .note-permalink:hover { transform: translateX(3px); }
+  [data-window="note"] .note-social { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--color-border); }
 </style>

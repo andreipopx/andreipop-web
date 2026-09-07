@@ -221,12 +221,14 @@ const openNote = (slug: string) => {
     body.innerHTML = '';
     body.appendChild(tpl.content.cloneNode(true));
   }
-  const permalink = noteWin.querySelector<HTMLAnchorElement>('[data-note-permalink]');
-  if (permalink) permalink.href = `/notas/${encodeURIComponent(slug)}`;
   // Update title bar
   const barTitle = noteWin.querySelector<HTMLElement>('.win-title');
   if (barTitle) barTitle.textContent = tpl.getAttribute('data-note-title') || 'Nota';
   openWindow('note', { center: true });
+  // Scroll al principio y notificar a Reacciones/Comentarios para que recarguen
+  const winBody = noteWin.querySelector<HTMLElement>('.win-body');
+  if (winBody) winBody.scrollTop = 0;
+  document.dispatchEvent(new CustomEvent('note:changed', { detail: { slug } }));
 };
 
 document.querySelectorAll<HTMLElement>('[data-nota-open]').forEach((btn) => {

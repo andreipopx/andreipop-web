@@ -71,7 +71,7 @@ const { slug } = Astro.props;
 
 <script define:vars={{ API: site.api.baseUrl, SITE_KEY: site.api.turnstileSiteKey }}>
   document.querySelectorAll('[data-comentarios]').forEach((root) => {
-    const slug = root.dataset.slug;
+    let currentSlug = root.dataset.slug || '';
     const form = root.querySelector('[data-cm-form]');
     const listEl = root.querySelector('[data-cm-list]');
     const countEl = root.querySelector('[data-cm-count]');
@@ -132,8 +132,11 @@ const { slug } = Astro.props;
     };
 
     const load = async () => {
+      if (!currentSlug) return;
+      if (countEl) countEl.textContent = '—';
+      if (listEl) listEl.innerHTML = '<div class="cm-empty">Cargando…</div>';
       try {
-        const r = await fetch(`${API}/comentarios/${encodeURIComponent(slug)}`);
+        const r = await fetch(`${API}/comentarios/${encodeURIComponent(currentSlug)}`);
         const data = await r.json();
         render(data.comentarios || []);
       } catch {
@@ -143,6 +146,7 @@ const { slug } = Astro.props;
 
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!currentSlug) return;
       const fd = new FormData(form);
       const nombre = fd.get('nombre');
       const mensaje = fd.get('mensaje');
@@ -154,7 +158,7 @@ const { slug } = Astro.props;
       if (msgEl) msgEl.textContent = 'Enviando…';
       let r, data;
       try {
-        r = await fetch(`${API}/comentarios/${encodeURIComponent(slug)}`, {
+        r = await fetch(`${API}/comentarios/${encodeURIComponent(currentSlug)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nombre, mensaje, token: currentToken }),
@@ -180,6 +184,16 @@ const { slug } = Astro.props;
       load();
     });
 
-    load();
+    // Recarga cuando cambia la nota abierta
+    document.addEventListener('note:changed', (ev) => {
+      const slug = ev?.detail?.slug;
+      if (!slug || root.dataset.dynamic !== 'true') return;
+      currentSlug = slug;
+      root.dataset.slug = slug;
+      if (msgEl) msgEl.textContent = '';
+      load();
+    });
+
+    if (currentSlug) load();
   });
 </script>
