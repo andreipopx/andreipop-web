@@ -279,8 +279,8 @@
 @media (max-width: 768px) {
   .menu-bar { padding: 0 12px; font-size: 11px; }
   .menu-bar > div:first-child > *:not(:first-child) { display: none; }
-  .dock { gap: 6px; padding: 6px 10px; bottom: 16px; }
-  .app-icon { width: 46px; height: 46px; border-radius: 12px; }
+  .dock { gap: 12px; padding: 6px 12px; bottom: 16px; }
+  .app-icon { width: 44px; height: 44px; border-radius: 12px; }
   .app-icon:hover { transform: none; }
   .app-icon-label { display: none; }
   .win {
@@ -522,22 +522,27 @@
     opacity: 1 !important;
     transform: translateX(-50%) translateY(0) !important;
     top: auto !important;
-    bottom: -18px !important;
-    padding: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    font-size: 9px !important;
+    bottom: -16px !important;
+    padding: 1px 5px !important;
     background: rgba(0,0,0,0.7) !important;
-    padding: 2px 6px !important;
-    border-radius: 4px !important;
+    box-shadow: none !important;
+    font-size: 8.5px !important;
     color: #fff !important;
     display: block !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    letter-spacing: 0.02em;
+    border-radius: 3px !important;
+    text-shadow: none;
+    letter-spacing: 0.01em;
     transition: none !important;
+    max-width: 60px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
   }
   .app-icon-label::after { display: none; }
-  /* Ajusta el dock para que el label quepa debajo */
-  .dock { bottom: 26px; padding-bottom: 22px; }
-  .dock-overflow { bottom: 100px; padding-bottom: 22px; }
+  /* Dock con espacio inferior para acomodar los labels */
+  .dock { bottom: 28px; padding-bottom: 22px; }
+  .dock-overflow { bottom: 106px; padding-bottom: 22px; }
+  /* Botón "more" ligeramente más pequeño para coincidir */
+  .dock-more { width: 44px; height: 44px; }
 }
