@@ -17,28 +17,64 @@ const fmt = (d: Date) =>
       <p style="font-size: 14px; color: var(--color-muted); margin: 0;">Cuando escriba algo aparecerá aquí.</p>
     </div>
   ) : (
-    <ul style="list-style: none; padding: 8px; margin: 0;">
+    <ul class="notas-list">
       {notas.map((n) => (
         <li>
-          <div style="display: grid; grid-template-columns: 100px 1fr auto; gap: 16px; align-items: baseline; padding: 14px 16px; border-radius: 8px;">
-            <div class="mono" style="font-size: 11px; color: var(--color-muted); text-transform: uppercase;">{fmt(n.data.date)}</div>
-            <div style="min-width: 0;">
-              <div style="font-size: 16px; font-weight: 500; letter-spacing: -0.01em; color: var(--color-ink);">{n.data.title}</div>
-              {n.data.excerpt && (
-                <div style="font-size: 13px; color: var(--color-muted); margin-top: 4px;">{n.data.excerpt}</div>
-              )}
+          <button
+            type="button"
+            data-nota-open={n.id}
+            class="nota-item"
+          >
+            <div class="mono nota-date">{fmt(n.data.date)}</div>
+            <div class="nota-main">
+              <div class="nota-title">{n.data.title}</div>
+              {n.data.excerpt && <div class="nota-excerpt">{n.data.excerpt}</div>}
               {n.data.tags.length > 0 && (
-                <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+                <div class="nota-tags">
                   {n.data.tags.map((t) => (
-                    <span class="mono" style="font-size: 10px; padding: 2px 8px; background: rgba(30,58,138,0.1); color: var(--color-indigo); border-radius: 999px;">#{t}</span>
+                    <span class="mono nota-tag">#{t}</span>
                   ))}
                 </div>
               )}
             </div>
-            <div class="cap" style="color: var(--color-indigo);">{n.data.kind === 'paper' ? 'Paper' : n.data.kind === 'ensayo' ? 'Ensayo' : 'Nota'}</div>
-          </div>
+            <div class="cap nota-kind">{n.data.kind === 'paper' ? 'Paper' : n.data.kind === 'ensayo' ? 'Ensayo' : 'Nota'}</div>
+          </button>
         </li>
       ))}
     </ul>
   )}
 </Window>
+
+<style is:global>
+  [data-window="notas"] .notas-list { list-style: none; padding: 8px; margin: 0; }
+  [data-window="notas"] .nota-item {
+    display: grid; grid-template-columns: 100px 1fr auto; gap: 16px;
+    align-items: baseline; width: 100%;
+    padding: 14px 16px; border: none; background: transparent;
+    text-align: left; font-family: inherit; cursor: pointer;
+    border-radius: 8px; color: inherit;
+    transition: background 0.15s ease-out;
+  }
+  [data-window="notas"] .nota-item:hover { background: rgba(30,58,138,0.06); }
+  :root[data-theme='dark'] [data-window="notas"] .nota-item:hover { background: rgba(147,197,253,0.08); }
+  [data-window="notas"] .nota-date {
+    font-size: 11px; color: var(--color-muted); text-transform: uppercase;
+  }
+  [data-window="notas"] .nota-main { min-width: 0; }
+  [data-window="notas"] .nota-title {
+    font-size: 16px; font-weight: 500; letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  [data-window="notas"] .nota-excerpt {
+    font-size: 13px; color: var(--color-muted); margin-top: 4px;
+  }
+  [data-window="notas"] .nota-tags {
+    display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+  }
+  [data-window="notas"] .nota-tag {
+    font-size: 10px; padding: 2px 8px;
+    background: rgba(30,58,138,0.1); color: var(--color-indigo);
+    border-radius: 999px;
+  }
+  [data-window="notas"] .nota-kind { color: var(--color-indigo); }
+</style>

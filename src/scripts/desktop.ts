@@ -190,6 +190,50 @@ document.querySelectorAll<HTMLElement>('.app-icon').forEach((btn) => {
   });
 });
 
+// Notas: click en un item abre NoteViewer con el contenido
+const openNote = (slug: string) => {
+  const tpl = document.querySelector<HTMLTemplateElement>(`[data-note-tpl="${slug}"]`);
+  const noteWin = win('note');
+  if (!tpl || !noteWin) return;
+  const empty = noteWin.querySelector<HTMLElement>('.note-viewer-empty');
+  const content = noteWin.querySelector<HTMLElement>('.note-viewer-content');
+  const title = noteWin.querySelector<HTMLElement>('[data-note-title]');
+  const meta  = noteWin.querySelector<HTMLElement>('[data-note-meta]');
+  const tagsEl= noteWin.querySelector<HTMLElement>('[data-note-tags]');
+  const body  = noteWin.querySelector<HTMLElement>('[data-note-body]');
+  if (empty)   empty.hidden = true;
+  if (content) content.hidden = false;
+  if (title) title.textContent = tpl.getAttribute('data-note-title') || '';
+  if (meta)  meta.textContent  = tpl.getAttribute('data-note-meta') || '';
+  if (tagsEl) {
+    tagsEl.innerHTML = '';
+    try {
+      const tags: string[] = JSON.parse(tpl.getAttribute('data-note-tags') || '[]');
+      tags.forEach((t) => {
+        const s = document.createElement('span');
+        s.className = 'tag mono';
+        s.textContent = `#${t}`;
+        tagsEl.appendChild(s);
+      });
+    } catch {}
+  }
+  if (body) {
+    body.innerHTML = '';
+    body.appendChild(tpl.content.cloneNode(true));
+  }
+  // Update title bar
+  const barTitle = noteWin.querySelector<HTMLElement>('.win-title');
+  if (barTitle) barTitle.textContent = tpl.getAttribute('data-note-title') || 'Nota';
+  openWindow('note', { center: true });
+};
+
+document.querySelectorAll<HTMLElement>('[data-nota-open]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const slug = btn.getAttribute('data-nota-open');
+    if (slug) openNote(slug);
+  });
+});
+
 // Dock "more" button (solo visible en mobile)
 const moreBtn = document.querySelector<HTMLElement>('[data-dock-more]');
 const overflow = document.querySelector<HTMLElement>('[data-dock-overflow]');

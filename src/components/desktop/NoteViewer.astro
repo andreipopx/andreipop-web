@@ -1,0 +1,74 @@
+---
+import Window from './Window.astro';
+import { getCollection, render } from 'astro:content';
+
+const notas = (await getCollection('notas')).filter((n) => !n.data.draft);
+---
+<!-- Ventana genérica de visor de nota. El contenido se hidrata desde plantillas al hacer click. -->
+<Window slug="note" title="Nota" x={280} y={90} width={620} height={560} z={100}>
+  <article class="note-viewer">
+    <div class="note-viewer-empty">Selecciona una nota de la lista para leerla aquí.</div>
+    <div class="note-viewer-content" hidden>
+      <header class="note-header">
+        <div class="mono note-meta" data-note-meta></div>
+        <h1 class="note-title" data-note-title></h1>
+        <div class="note-tags" data-note-tags></div>
+      </header>
+      <div class="note-body" data-note-body></div>
+    </div>
+  </article>
+</Window>
+
+<!-- Plantillas con el contenido de cada nota (una por nota, oculta hasta pedirla) -->
+{notas.length > 0 && (
+  <div style="display: none;">
+    {await Promise.all(notas.map(async (n) => {
+      const { Content } = await render(n);
+      const dateStr = n.data.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+      return (
+        <template data-note-tpl={n.id} data-note-title={n.data.title} data-note-meta={`${dateStr} · ${n.data.kind}`} data-note-tags={JSON.stringify(n.data.tags)}>
+          <Content />
+        </template>
+      );
+    }))}
+  </div>
+)}
+
+<style is:global>
+  [data-window="note"] .note-viewer { padding: 32px 36px; }
+  [data-window="note"] .note-viewer-empty {
+    text-align: center; color: var(--color-muted);
+    padding: 60px 20px; font-size: 14px;
+  }
+  [data-window="note"] .note-header { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border); }
+  [data-window="note"] .note-meta { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 10px; }
+  [data-window="note"] .note-title { font-size: 32px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 12px; color: var(--color-ink); }
+  [data-window="note"] .note-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  [data-window="note"] .note-tags .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; padding: 2px 8px;
+    background: rgba(30,58,138,0.1); color: var(--color-indigo);
+    border-radius: 999px;
+  }
+  [data-window="note"] .note-body { color: var(--color-ink); font-size: 15px; line-height: 1.75; }
+  [data-window="note"] .note-body p { margin: 0 0 16px; }
+  [data-window="note"] .note-body h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin: 32px 0 12px; color: var(--color-ink); }
+  [data-window="note"] .note-body h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; color: var(--color-ink); }
+  [data-window="note"] .note-body a { color: var(--color-indigo); text-decoration: underline; text-underline-offset: 3px; }
+  [data-window="note"] .note-body ul, [data-window="note"] .note-body ol { padding-left: 22px; margin: 0 0 16px; }
+  [data-window="note"] .note-body li { margin: 4px 0; }
+  [data-window="note"] .note-body blockquote {
+    border-left: 3px solid var(--color-indigo);
+    padding-left: 16px; margin: 16px 0; color: var(--color-muted); font-style: italic;
+  }
+  [data-window="note"] .note-body img { max-width: 100%; border-radius: 8px; margin: 16px 0; }
+  [data-window="note"] .note-body code {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    padding: 2px 6px; background: var(--color-border); border-radius: 4px;
+  }
+  [data-window="note"] .note-body pre {
+    background: var(--color-canvas); border: 1px solid var(--color-border);
+    padding: 14px; border-radius: 8px; overflow-x: auto; margin: 16px 0;
+  }
+  [data-window="note"] .note-body pre code { background: none; padding: 0; }
+</style>

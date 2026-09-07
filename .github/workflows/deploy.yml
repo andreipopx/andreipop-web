@@ -1,0 +1,36 @@
+name: Build & deploy on pop
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux, pop]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 11
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Build
+        run: pnpm build
+
+      - name: Deploy to /home/andrei/andreipop-web/dist (rsync)
+        run: |
+          # Nginx sirve directamente desde este directorio; solo hay que
+          # sobreescribir el dist en el path del bind mount del contenedor.
+          rsync -a --delete dist/ /home/andrei/andreipop-web/dist/
