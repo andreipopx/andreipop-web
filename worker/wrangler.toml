@@ -3,6 +3,11 @@ main = "src/index.ts"
 compatibility_date = "2026-09-07"
 compatibility_flags = ["nodejs_compat"]
 
+# Custom domain routing (evita *.workers.dev que a veces bloquean adblockers)
+routes = [
+  { pattern = "api.andreipop.org", custom_domain = true }
+]
+
 # KV namespace para todos los datos (firmas, reacciones, comentarios).
 # Namespace ID confirmado por el usuario.
 [[kv_namespaces]]
@@ -13,6 +18,7 @@ id = "bcabab9223e04cd2ac2218a46fab4966"
 [vars]
 TURNSTILE_SITE_KEY = "0x4AAAAAAEr9hGhp4o0sSfMd"
 ALLOWED_ORIGIN = "https://andreipop.org"
+# En Cloudflare Turnstile hostnames añadir: api.andreipop.org también
 
 # Secretos (se añaden con `wrangler secret put`):
 # - TURNSTILE_SECRET_KEY

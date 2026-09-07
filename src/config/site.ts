@@ -17,7 +17,7 @@ export const site = {
 
   /** Endpoints y keys públicas del backend. */
   api: {
-    baseUrl: 'https://andreipop-api.mrandreipop.workers.dev',
+    baseUrl: 'https://api.andreipop.org',
     turnstileSiteKey: '0x4AAAAAAEr9hGhp4o0sSfMd',
     cloudinaryCloudName: 'up7czvhe',
   },
