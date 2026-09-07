@@ -3,9 +3,9 @@ main = "src/index.ts"
 compatibility_date = "2026-09-07"
 compatibility_flags = ["nodejs_compat"]
 
-# Custom domain routing (evita *.workers.dev que a veces bloquean adblockers)
+# Ruta bajo dominio principal — evita subdominios que algunos adblockers bloquean
 routes = [
-  { pattern = "api.andreipop.org", custom_domain = true }
+  { pattern = "andreipop.org/api/*", zone_name = "andreipop.org" }
 ]
 
 # KV namespace para todos los datos (firmas, reacciones, comentarios).

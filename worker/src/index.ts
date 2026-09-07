@@ -208,7 +208,8 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors(env) });
 
     const url = new URL(req.url);
-    const path = url.pathname.replace(/\/+$/, '');
+    // Quita el prefijo /api (viene del route pattern andreipop.org/api/*)
+    const path = url.pathname.replace(/^\/api/, '').replace(/\/+$/, '');
     const method = req.method;
 
     try {
