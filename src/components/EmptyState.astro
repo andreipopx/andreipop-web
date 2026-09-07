@@ -1,0 +1,14 @@
+---
+interface Props {
+  section: string;
+}
+const { section } = Astro.props;
+---
+<section class="mx-auto flex max-w-[640px] flex-col items-start gap-6 px-8 py-24 md:py-40">
+  <div class="cap">{section}</div>
+  <h1 class="display-hero text-[44px] md:text-[56px] text-ink">Todavía no hay nada aquí.</h1>
+  <p class="text-lg leading-relaxed text-muted">
+    Estoy en ello. Vuelve pronto, o suscríbete al <a href="/feed.xml" class="link-indigo">RSS</a> para saber cuando publique algo.
+  </p>
+  <a href="/" class="text-sm link-indigo">← volver a inicio</a>
+</section>

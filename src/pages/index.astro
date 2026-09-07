@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProjectsShowcase from '../components/ProjectsShowcase.astro';
+import { site } from '../config/site';
+---
+<Layout>
+  <!-- Soft indigo wash detrás del hero -->
+  <div class="pointer-events-none absolute inset-x-0 top-0 z-0 h-[480px] bg-[image:var(--wash-indigo)] opacity-60"></div>
+
+  <!-- Hero -->
+  <section class="relative z-[1] mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-14 px-8 pt-16 pb-24 md:grid-cols-[1.6fr_1fr] md:gap-[72px] md:px-[72px]">
+    <div class="flex flex-col gap-7">
+      <h1 class="display-hero text-[56px] md:text-[96px]">
+        {site.hero.salutation} <span class="text-indigo">{site.hero.name}</span>.
+      </h1>
+      <p class="max-w-[560px] text-lg leading-normal text-[#374151] md:text-xl">
+        {site.bio}
+      </p>
+    </div>
+    <div class="relative aspect-[4/5] overflow-hidden rounded-card bg-gradient-to-br from-[#dbeafe] via-[#c7d2fe] to-[#e9d5ff] shadow-[0_30px_60px_-20px_rgba(30,58,138,0.18)]">
+      <svg viewBox="0 0 200 250" preserveAspectRatio="xMidYMid slice" class="h-full w-full">
+        <circle cx="100" cy="88" r="40" fill="#1e3a8a" opacity="0.32"/>
+        <path d="M40 250 Q40 150 100 150 Q160 150 160 250 Z" fill="#1e3a8a" opacity="0.32"/>
+      </svg>
+      <div class="absolute bottom-3 left-3 rounded-full bg-[rgba(15,17,21,0.7)] px-2.5 py-1 text-[11px] text-white backdrop-blur">← foto tuya aquí</div>
+    </div>
+  </section>
+
+  <ProjectsShowcase />
+
+  {/*
+    Marquee "Ahora mismo", "Últimas cosas" y "Fotos del carrete" aparecerán
+    cuando haya contenido real que las alimente. Diseñadas en el mockup v4;
+    quedan pendientes de activar.
+  */}
+</Layout>

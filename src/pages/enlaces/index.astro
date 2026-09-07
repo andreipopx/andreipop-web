@@ -1,0 +1,38 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import { getCollection } from 'astro:content';
+
+const links = (await getCollection('enlaces'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<Layout title="Enlaces">
+  {links.length === 0 ? (
+    <EmptyState section="Enlaces" />
+  ) : (
+    <section class="mx-auto flex max-w-[720px] flex-col gap-10 px-8 py-16 md:py-24">
+      <div class="flex flex-col gap-2">
+        <div class="cap">Enlaces</div>
+        <h1 class="display-hero text-[56px]">Cosas que me gustan.</h1>
+      </div>
+      <ul class="flex flex-col">
+        {links.map((l) => (
+          <li>
+            <a href={l.data.url} target="_blank" rel="noopener" class="grid grid-cols-[3px_100px_1fr_auto] items-baseline gap-6 border-t border-border py-6">
+              <div class="min-h-11 rounded-[2px] bg-cat-enlaces" style="width:3px"></div>
+              <div class="text-xs tabular-nums text-muted">
+                {l.data.date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '·').toUpperCase()}
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="text-xl font-medium text-ink tracking-tight-2">{l.data.title}</div>
+                {l.data.source && <div class="text-sm text-muted">{l.data.source}</div>}
+              </div>
+              <div class="cap" style="color: var(--color-cat-enlaces)">Abrir ↗</div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Layout>

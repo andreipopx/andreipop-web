@@ -1,0 +1,48 @@
+---
+interface Props {
+  title: string;
+  tagline: string;
+  initial: string;
+  accent: 'indigo' | 'orange' | 'emerald' | 'violet' | 'amber';
+  href?: string;
+}
+const { title, tagline, initial, accent, href } = Astro.props;
+
+const gradients: Record<Props['accent'], string> = {
+  indigo:  'bg-gradient-to-br from-[#1e3a8a] via-[#4338ca] to-[#7c3aed]',
+  orange:  'bg-gradient-to-br from-[#f97316] to-[#ef4444]',
+  emerald: 'bg-gradient-to-br from-[#10b981] to-[#059669]',
+  violet:  'bg-gradient-to-br from-[#7c3aed] to-[#a855f7]',
+  amber:   'bg-gradient-to-br from-[#f59e0b] to-[#f97316]',
+};
+
+const initialFg: Record<Props['accent'], string> = {
+  indigo:  'text-[#1e3a8a]',
+  orange:  'text-[#ea580c]',
+  emerald: 'text-[#059669]',
+  violet:  'text-[#6d28d9]',
+  amber:   'text-[#b45309]',
+};
+
+const Tag = href ? 'a' : 'div';
+---
+<Tag
+  href={href}
+  class:list={[
+    'group relative flex min-h-[320px] flex-col justify-between overflow-hidden rounded-card p-7 text-white transition-transform hover:-translate-y-0.5',
+    gradients[accent],
+  ]}
+>
+  <div
+    class:list={[
+      'relative z-[2] flex h-11 w-11 items-center justify-center rounded-xl bg-white text-[22px] font-bold',
+      initialFg[accent],
+    ]}
+  >
+    {initial}
+  </div>
+  <div class="relative z-[2]">
+    <h3 class="text-[40px] font-bold leading-none tracking-tight-3">{title}</h3>
+    <p class="mt-3 max-w-[300px] text-[14px] leading-normal opacity-90">{tagline}</p>
+  </div>
+</Tag>

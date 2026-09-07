@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   Brand tokens — andreipop.org
+   Sistema en memoria: brand-system.md + sprezzatura.md
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --color-ink: #0f1115;
+  --color-canvas: #fafbfc;
+  --color-muted: #6b7280;
+  --color-border: #eaecef;
+  --color-indigo: #1e3a8a;
+  --color-indigo-hover: #1d4ed8;
+
+  --color-cat-viajes: #1e3a8a;
+  --color-cat-reflexiones: #7c3aed;
+  --color-cat-papers: #059669;
+  --color-cat-enlaces: #f59e0b;
+  --color-cat-proyectos: #059669;
+
+  --radius-card: 20px;
+
+  --wash-indigo: linear-gradient(180deg, #eef2ff 0%, transparent 100%);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  ::selection {
+    background: var(--color-indigo);
+    color: #fff;
+  }
+}
+
+@layer components {
+  .link-indigo {
+    color: var(--color-indigo);
+    transition: color 150ms ease-out;
+  }
+  .link-indigo:hover { color: var(--color-indigo-hover); }
+
+  .cap {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    font-weight: 500;
+  }
+
+  .display-hero {
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+  }
+  .display-section {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+  }
+}
+
+/* Grano SVG overlay lives in <Grain /> component (SVG feTurbulence) */
