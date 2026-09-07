@@ -514,3 +514,26 @@
   .app-icon.is-secondary { display: none; }
   .dock .dock-sep { display: none; }
 }
+
+/* Mobile: labels siempre visibles debajo de cada app icon */
+@media (max-width: 768px) {
+  .app-icon { position: relative; overflow: visible; }
+  .app-icon-label {
+    opacity: 1 !important;
+    transform: translateX(-50%) translateY(0) !important;
+    top: auto !important;
+    bottom: -18px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-size: 9px !important;
+    color: var(--color-menu-text) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    letter-spacing: 0.02em;
+    transition: none !important;
+  }
+  .app-icon-label::after { display: none; }
+  /* Ajusta el dock para que el label quepa debajo */
+  .dock { bottom: 26px; padding-bottom: 22px; }
+  .dock-overflow { bottom: 100px; padding-bottom: 22px; }
+}
