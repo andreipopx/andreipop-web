@@ -2,68 +2,65 @@
 interface Props {
   slug: string;
   label: string;
-  accent: 'amber' | 'violet' | 'red' | 'emerald' | 'blue' | 'pink' | 'teal';
   icon: 'note' | 'box' | 'star' | 'compass' | 'mail' | 'photos' | 'pen';
+  secondary?: boolean;
 }
-const { slug, label, accent, icon } = Astro.props;
+const { slug, label, icon, secondary } = Astro.props;
 
-const gradientStops: Record<Props['accent'], [string, string]> = {
-  amber:   ['#fef3c7', '#fbbf24'],
-  violet:  ['#ddd6fe', '#7c3aed'],
-  red:     ['#fecaca', '#ef4444'],
-  emerald: ['#d1fae5', '#059669'],
-  blue:    ['#bfdbfe', '#1e3a8a'],
-  pink:    ['#fbcfe8', '#db2777'],
-  teal:    ['#99f6e4', '#0d9488'],
+const iconVars: Record<Props['icon'], string> = {
+  note:    'note',
+  box:     'box',
+  star:    'star',
+  compass: 'compass',
+  mail:    'mail',
+  photos:  'photos',
+  pen:     'pen',
 };
-const [from, to] = gradientStops[accent];
-const stroke = to;
+const v = iconVars[icon];
+const fromCss = `var(--icon-${v}-from)`;
+const toCss   = `var(--icon-${v}-to)`;
 ---
-<button type="button" class="app-icon" data-app={slug} aria-label={`Abrir ${label}`} style="background: transparent;">
+<button
+  type="button"
+  class:list={['app-icon', { 'is-secondary': secondary }]}
+  data-app={slug}
+  aria-label={`Abrir ${label}`}
+  style="background: transparent;"
+>
   {icon === 'note' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
-      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color={from}/><stop offset="1" stop-color={to}/></linearGradient></defs>
+      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
       <rect x="12" y="9" width="30" height="36" rx="3" fill="#fffbeb"/>
       <rect x="12" y="9" width="30" height="7" fill="#f59e0b" opacity="0.9"/>
-      <line x1="17" y1="24" x2="37" y2="24" stroke={stroke} stroke-width="1.2" opacity="0.7"/>
-      <line x1="17" y1="29" x2="37" y2="29" stroke={stroke} stroke-width="1.2" opacity="0.6"/>
-      <line x1="17" y1="34" x2="32" y2="34" stroke={stroke} stroke-width="1.2" opacity="0.55"/>
-      <line x1="17" y1="39" x2="35" y2="39" stroke={stroke} stroke-width="1.2" opacity="0.5"/>
+      <line x1="17" y1="24" x2="37" y2="24" stroke={toCss} stroke-width="1.2" opacity="0.7"/>
+      <line x1="17" y1="29" x2="37" y2="29" stroke={toCss} stroke-width="1.2" opacity="0.6"/>
+      <line x1="17" y1="34" x2="32" y2="34" stroke={toCss} stroke-width="1.2" opacity="0.55"/>
+      <line x1="17" y1="39" x2="35" y2="39" stroke={toCss} stroke-width="1.2" opacity="0.5"/>
     </svg>
   )}
   {icon === 'box' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
-      <defs>
-        <linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color={from}/><stop offset="1" stop-color={to}/></linearGradient>
-        <linearGradient id={`box-face-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e0e7ff"/></linearGradient>
-      </defs>
+      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <path d="M27 9 L44 17 L44 37 L27 45 L10 37 L10 17 Z" fill={`url(#box-face-${slug})`} stroke={stroke} stroke-width="1"/>
-      <path d="M10 17 L27 25 L44 17" fill="none" stroke={stroke} stroke-width="1"/>
-      <path d="M27 25 L27 45" stroke={stroke} stroke-width="1" opacity="0.5"/>
-      <path d="M27 9 L27 25 M18.5 13 L35.5 21 M35.5 13 L18.5 21" stroke={stroke} stroke-width="1" opacity="0.6"/>
+      <path d="M27 9 L44 17 L44 37 L27 45 L10 37 L10 17 Z" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="1"/>
+      <path d="M10 17 L27 25 L44 17" fill="none" stroke={toCss} stroke-width="1"/>
+      <path d="M27 25 L27 45" stroke={toCss} stroke-width="1" opacity="0.5"/>
+      <path d="M27 9 L27 25 M18.5 13 L35.5 21 M35.5 13 L18.5 21" stroke={toCss} stroke-width="1" opacity="0.6"/>
     </svg>
   )}
   {icon === 'star' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
-      <defs>
-        <linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color={from}/><stop offset="0.6" stop-color={to}/><stop offset="1" stop-color="#b91c1c"/></linearGradient>
-        <linearGradient id={`star-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef9c3"/><stop offset="1" stop-color="#fbbf24"/></linearGradient>
-      </defs>
+      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <path d="M27 8 L32 22 L47 22 L35 30 L39 44 L27 36 L15 44 L19 30 L7 22 L22 22 Z" fill={`url(#star-${slug})`} stroke="#78350f" stroke-width="0.8" stroke-linejoin="round"/>
-      <path d="M23 15 L25 20 L20 18 Z" fill="#fff" opacity="0.5"/>
+      <path d="M27 8 L32 22 L47 22 L35 30 L39 44 L27 36 L15 44 L19 30 L7 22 L22 22 Z" fill="#fef9c3" stroke="#78350f" stroke-width="0.8" stroke-linejoin="round"/>
     </svg>
   )}
   {icon === 'compass' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
-      <defs>
-        <linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color={from}/><stop offset="1" stop-color={to}/></linearGradient>
-        <radialGradient id={`face-${slug}`} cx="0.35" cy="0.3"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d1fae5"/></radialGradient>
-      </defs>
+      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <circle cx="27" cy="27" r="17" fill={`url(#face-${slug})`} stroke={stroke} stroke-width="1.2"/>
+      <circle cx="27" cy="27" r="17" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="1.2"/>
       <path d="M27 13 L30 27 L27 24 Z" fill="#dc2626"/>
       <path d="M27 41 L24 27 L27 30 Z" fill="#0f1115"/>
       <circle cx="27" cy="27" r="2" fill="#0f1115"/>
@@ -71,50 +68,36 @@ const stroke = to;
   )}
   {icon === 'mail' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
-      <defs>
-        <linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color={from}/><stop offset="1" stop-color={to}/></linearGradient>
-        <linearGradient id={`env-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dbeafe"/></linearGradient>
-      </defs>
+      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <rect x="9" y="16" width="36" height="24" rx="3" fill={`url(#env-${slug})`} stroke={stroke} stroke-width="0.8"/>
-      <path d="M9 16 L27 30 L45 16" fill="none" stroke={stroke} stroke-width="1"/>
+      <rect x="9" y="16" width="36" height="24" rx="3" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="0.8"/>
+      <path d="M9 16 L27 30 L45 16" fill="none" stroke={toCss} stroke-width="1"/>
     </svg>
   )}
   {icon === 'photos' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
       <defs>
-        <linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color={from}/><stop offset="1" stop-color={to}/></linearGradient>
+        <linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient>
         <linearGradient id={`sky-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5b4fc"/><stop offset="0.5" stop-color="#fbcfe8"/><stop offset="1" stop-color="#fed7aa"/></linearGradient>
       </defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <!-- Frame -->
-      <rect x="10" y="12" width="34" height="26" rx="3" fill="#fff" stroke={stroke} stroke-width="0.8"/>
+      <rect x="10" y="12" width="34" height="26" rx="3" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="0.8"/>
       <rect x="12" y="14" width="30" height="18" fill={`url(#sky-${slug})`}/>
-      <!-- sol y montaña dentro del frame -->
       <circle cx="35" cy="20" r="3" fill="#fbbf24" opacity="0.9"/>
       <path d="M12 32 L18 26 L25 30 L32 24 L42 32 Z" fill="#7c3aed" opacity="0.7"/>
-      <path d="M12 32 L15 29 L20 32 L28 27 L35 31 L42 32 Z" fill="#1e1b4b" opacity="0.85"/>
-      <!-- botón shutter -->
-      <circle cx="27" cy="42" r="3" fill={stroke}/>
+      <circle cx="27" cy="42" r="3" fill={toCss}/>
       <circle cx="27" cy="42" r="1.5" fill="#fff"/>
     </svg>
   )}
   {icon === 'pen' && (
     <svg width="54" height="54" viewBox="0 0 54 54" style="display:block;">
-      <defs>
-        <linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color={from}/><stop offset="1" stop-color={to}/></linearGradient>
-        <linearGradient id={`paper-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f9fafb"/></linearGradient>
-      </defs>
+      <defs><linearGradient id={`bg-${slug}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={`stop-color: ${fromCss}`}/><stop offset="1" style={`stop-color: ${toCss}`}/></linearGradient></defs>
       <rect width="54" height="54" rx="14" fill={`url(#bg-${slug})`}/>
-      <!-- Papel -->
-      <rect x="10" y="12" width="24" height="30" rx="1" fill={`url(#paper-${slug})`} stroke={stroke} stroke-width="0.6"/>
-      <line x1="14" y1="20" x2="30" y2="20" stroke={stroke} stroke-width="0.6" opacity="0.4"/>
-      <line x1="14" y1="26" x2="28" y2="26" stroke={stroke} stroke-width="0.6" opacity="0.4"/>
-      <line x1="14" y1="32" x2="30" y2="32" stroke={stroke} stroke-width="0.6" opacity="0.4"/>
-      <!-- Firma manuscrita -->
-      <path d="M17 37 Q19 34 22 37 Q25 40 28 36" fill="none" stroke={stroke} stroke-width="1.2" stroke-linecap="round"/>
-      <!-- Pluma -->
-      <path d="M38 10 L48 10 L46 20 L36 42 L32 44 L34 40 L44 18 Z" fill="#0f1115" stroke={stroke} stroke-width="0.6" stroke-linejoin="round"/>
+      <rect x="10" y="12" width="24" height="30" rx="1" fill="#fff" opacity="0.95" stroke={toCss} stroke-width="0.6"/>
+      <line x1="14" y1="20" x2="30" y2="20" stroke={toCss} stroke-width="0.6" opacity="0.4"/>
+      <line x1="14" y1="26" x2="28" y2="26" stroke={toCss} stroke-width="0.6" opacity="0.4"/>
+      <path d="M17 37 Q19 34 22 37 Q25 40 28 36" fill="none" stroke={toCss} stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M38 10 L48 10 L46 20 L36 42 L32 44 L34 40 L44 18 Z" fill="#0f1115" stroke={toCss} stroke-width="0.6" stroke-linejoin="round"/>
       <path d="M32 44 L34 40 L36 42 Z" fill="#dbeafe"/>
     </svg>
   )}

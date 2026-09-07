@@ -181,7 +181,30 @@ document.querySelectorAll<HTMLElement>('.app-icon').forEach((btn) => {
   btn.addEventListener('click', () => {
     const slug = btn.getAttribute('data-app');
     if (slug) toggleWindow(slug);
+    // Cierra el overflow menu al elegir una app
+    const overflow = document.querySelector<HTMLElement>('[data-dock-overflow]');
+    const moreBtn = document.querySelector<HTMLElement>('[data-dock-more]');
+    overflow?.classList.remove('is-open');
+    moreBtn?.classList.remove('is-open');
+    moreBtn?.setAttribute('aria-expanded', 'false');
   });
+});
+
+// Dock "more" button (solo visible en mobile)
+const moreBtn = document.querySelector<HTMLElement>('[data-dock-more]');
+const overflow = document.querySelector<HTMLElement>('[data-dock-overflow]');
+moreBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = overflow?.classList.toggle('is-open');
+  moreBtn.classList.toggle('is-open', !!isOpen);
+  moreBtn.setAttribute('aria-expanded', String(!!isOpen));
+});
+document.addEventListener('click', (e) => {
+  if (!(e.target as HTMLElement).closest('[data-dock-more], [data-dock-overflow]')) {
+    overflow?.classList.remove('is-open');
+    moreBtn?.classList.remove('is-open');
+    moreBtn?.setAttribute('aria-expanded', 'false');
+  }
 });
 
 // ─── window · traffic + drag + resize + dblclick ────────────
@@ -430,9 +453,11 @@ const applyPhase = () => {
   }
   if (stars) stars.setAttribute('opacity', String(p.stars));
   if (glow) glow.setAttribute('opacity', String(p.glow));
-  wp.querySelector<SVGPathElement>('[data-mountain-back]')?.setAttribute('opacity', String(p.mtnBack));
-  wp.querySelector<SVGPathElement>('[data-mountain-mid]')?.setAttribute('opacity', String(p.mtnMid));
-  wp.querySelector<SVGPathElement>('[data-mountain-front]')?.setAttribute('opacity', String(p.mtnFront));
+  // Waves (Big Sur) mantienen su color pero se les ajusta la opacidad como
+  // si fueran capas de "montaña" (más opacas en modos oscuros).
+  wp.querySelector<SVGPathElement>('[data-wave-back]')?.setAttribute('opacity', String(0.5 + p.mtnBack * 0.4));
+  wp.querySelector<SVGPathElement>('[data-wave-mid]')?.setAttribute('opacity', String(0.65 + p.mtnMid * 0.3));
+  wp.querySelector<SVGPathElement>('[data-wave-front]')?.setAttribute('opacity', String(0.8 + p.mtnFront * 0.2));
 };
 
 // ─── menu bar dropdowns ────────────────────────────────────

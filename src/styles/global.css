@@ -437,3 +437,80 @@
 :root[data-cursor='custom'] .win-resize.se {
   cursor: url('/cursors/resizenorthwestsoutheast.svg') 12 12, nwse-resize;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Icon theme-adaptive colors
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --icon-note-from:    #fef3c7;
+  --icon-note-to:      #fbbf24;
+  --icon-box-from:     #ede9fe;
+  --icon-box-to:       #7c3aed;
+  --icon-star-from:    #fecaca;
+  --icon-star-to:      #ef4444;
+  --icon-compass-from: #d1fae5;
+  --icon-compass-to:   #059669;
+  --icon-mail-from:    #bfdbfe;
+  --icon-mail-to:      #1e3a8a;
+  --icon-photos-from:  #fbcfe8;
+  --icon-photos-to:    #db2777;
+  --icon-pen-from:     #99f6e4;
+  --icon-pen-to:       #0d9488;
+}
+:root[data-theme='dark'] {
+  --icon-note-from:    #78350f;
+  --icon-note-to:      #b45309;
+  --icon-box-from:     #4c1d95;
+  --icon-box-to:       #7c3aed;
+  --icon-star-from:    #7f1d1d;
+  --icon-star-to:      #dc2626;
+  --icon-compass-from: #064e3b;
+  --icon-compass-to:   #059669;
+  --icon-mail-from:    #172554;
+  --icon-mail-to:      #3b82f6;
+  --icon-photos-from:  #831843;
+  --icon-photos-to:    #db2777;
+  --icon-pen-from:     #134e4a;
+  --icon-pen-to:       #14b8a6;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Mobile dock: 4 primary + "more" button + overflow menu
+   ───────────────────────────────────────────────────────────── */
+
+.dock-more {
+  display: none;
+  width: 46px; height: 46px; border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--color-ink);
+  align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+}
+.dock-more:hover { background: rgba(255,255,255,0.25); }
+.dock-more.is-open { background: var(--color-indigo); color: #fff; }
+
+.dock-overflow {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  z-index: 9998;
+  display: none;
+  gap: 10px; padding: 8px 12px;
+  background: var(--color-dock-bg);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--color-dock-border);
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  animation: overflow-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dock-overflow.is-open { display: flex; }
+@keyframes overflow-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .dock-more { display: flex; }
+  .app-icon.is-secondary { display: none; }
+  .dock .dock-sep { display: none; }
+}
