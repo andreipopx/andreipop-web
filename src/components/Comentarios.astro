@@ -137,10 +137,15 @@ const { slug } = Astro.props;
       if (listEl) listEl.innerHTML = '<div class="cm-empty">Cargando…</div>';
       try {
         const r = await fetch(`${API}/comentarios/${encodeURIComponent(currentSlug)}`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const data = await r.json();
         render(data.comentarios || []);
-      } catch {
-        if (listEl) listEl.innerHTML = '<div class="cm-empty">No se pudieron cargar los comentarios.</div>';
+      } catch (err) {
+        console.warn('[comentarios] load failed:', err);
+        // No mostramos error alarmante — tratamos como lista vacía.
+        // Si de verdad hay un problema, el usuario verá el warning en consola
+        // y al enviar un comentario obtendrá un mensaje de error específico.
+        render([]);
       }
     };
 

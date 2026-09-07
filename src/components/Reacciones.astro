@@ -76,8 +76,21 @@ const emojis = ['❤️','🔥','👏','🤔','😂','🎉'];
       try {
         const r = await fetch(`${API}/reacciones/${encodeURIComponent(currentSlug)}`);
         const data = await r.json();
-        paintCounts(data.cuentas || {});
-      } catch {
+        const cuentas = data.cuentas || {};
+        // Auto-limpia localStorage stale: si tenía un emoji marcado pero el
+        // server dice 0 (POST anterior falló o KV vacío), lo quitamos para
+        // que el usuario pueda intentar reaccionar de nuevo.
+        let changed = false;
+        for (const emoji of [...mine]) {
+          if (!cuentas[emoji] || cuentas[emoji] === 0) {
+            mine.delete(emoji);
+            changed = true;
+          }
+        }
+        if (changed) localStorage.setItem(`rx:${currentSlug}`, JSON.stringify([...mine]));
+        paintCounts(cuentas);
+      } catch (err) {
+        console.warn('[reacciones] load failed:', err);
         paintCounts({});
       }
     };
@@ -100,8 +113,12 @@ const emojis = ['❤️','🔥','👏','🤔','😂','🎉'];
             mine.add(emoji);
             localStorage.setItem(`rx:${currentSlug}`, JSON.stringify([...mine]));
             paintCounts(data.cuentas || {});
+          } else {
+            console.warn(`[reacciones] POST ${emoji} → ${r.status}:`, data);
           }
-        } catch {}
+        } catch (err) {
+          console.warn('[reacciones] POST failed:', err);
+        }
       });
     });
 
