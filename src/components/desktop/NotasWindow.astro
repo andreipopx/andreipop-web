@@ -1,6 +1,7 @@
 ---
 import Window from './Window.astro';
 import { getCollection } from 'astro:content';
+import { site } from '../../config/site';
 
 const notas = (await getCollection('notas'))
   .filter((n) => !n.data.draft)
@@ -36,6 +37,11 @@ const fmt = (d: Date) =>
                   ))}
                 </div>
               )}
+              <div class="nota-stats" data-nota-stats={n.id} hidden>
+                <span class="ns-item"><span class="ns-icon">♡</span><span data-rx-count>0</span></span>
+                <span class="ns-sep">·</span>
+                <span class="ns-item"><span class="ns-icon">💬</span><span data-cm-count>0</span></span>
+              </div>
             </div>
             <div class="cap nota-kind">{n.data.kind === 'paper' ? 'Paper' : n.data.kind === 'ensayo' ? 'Ensayo' : 'Nota'}</div>
           </button>
@@ -77,4 +83,31 @@ const fmt = (d: Date) =>
     border-radius: 999px;
   }
   [data-window="notas"] .nota-kind { color: var(--color-indigo); }
+  [data-window="notas"] .nota-stats {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 8px;
+    font-size: 11px; color: var(--color-muted);
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+  [data-window="notas"] .nota-stats .ns-icon { margin-right: 4px; opacity: 0.75; }
+  [data-window="notas"] .nota-stats .ns-sep { opacity: 0.4; }
 </style>
+
+<script define:vars={{ API: site.api.baseUrl }}>
+  document.querySelectorAll('[data-nota-stats]').forEach(async (row) => {
+    const slug = row.dataset.notaStats;
+    try {
+      const [rxRes, cmRes] = await Promise.all([
+        fetch(`${API}/reacciones/${encodeURIComponent(slug)}`).then((r) => r.json()),
+        fetch(`${API}/comentarios/${encodeURIComponent(slug)}`).then((r) => r.json()),
+      ]);
+      const rxTotal = Object.values(rxRes?.cuentas || {}).reduce((s, n) => s + (n || 0), 0);
+      const cmTotal = (cmRes?.comentarios || []).length;
+      // Solo pintamos si hay al menos algo — sprezzatura, evitar el "0 · 0" ruidoso
+      if (rxTotal === 0 && cmTotal === 0) return;
+      row.querySelector('[data-rx-count]').textContent = String(rxTotal);
+      row.querySelector('[data-cm-count]').textContent = String(cmTotal);
+      row.hidden = false;
+    } catch {}
+  });
+</script>
