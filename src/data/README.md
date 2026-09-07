@@ -1,7 +1,17 @@
 # Colecciones editables · data/
 
-Cada fichero JSON aquí es una lista editable manualmente. Añades una entrada nueva
-y aparece en la app **Intereses** del escritorio en el próximo build.
+Cada fichero JSON aquí es una lista editable manualmente. Añades una entrada
+y aparece en la app correspondiente en el próximo build (auto-deploy vía
+GitHub Actions ~30-60s tras el push).
+
+**JSON no admite comentarios.** Los `//` en los ejemplos de abajo son solo
+para explicar las opciones — no los pegues en tu fichero real.
+
+## Apps que leen estos ficheros
+
+- `enlaces.json`, `libros.json`, `musica.json`, `peliculas.json`, `quotes.json`
+  → app **Intereses** (5 pestañas)
+- `galeria.json` → app **Galería**
 
 ## Estructura de cada colección
 
@@ -18,20 +28,22 @@ y aparece en la app **Intereses** del escritorio en el próximo build.
   }
 ]
 ```
+Campos: `title` y `url` obligatorios. `source`, `date`, `note`, `tags` opcionales.
 
 ### `libros.json`
 ```json
 [
   {
+    "status": "leyendo",
     "title": "Servant Economy",
     "author": "Jathan Sadowski",
-    "status": "leyendo",    // "leyendo" | "leido" | "quiero"
-    "rating": null,          // 1-5 o null si no aplica
-    "date": "2026-08",       // fecha aproximada
+    "date": "2026-08",
+    "rating": null,
     "note": "sobre economía política de la IA"
   }
 ]
 ```
+Campos: `title`, `author`, `status` obligatorios (`status` es una de `"leyendo"`, `"leido"`, `"quiero"`). `date`, `rating` (1-5 o `null`), `note` opcionales.
 
 ### `musica.json`
 ```json
@@ -39,13 +51,14 @@ y aparece en la app **Intereses** del escritorio en el próximo build.
   {
     "title": "Poems",
     "artist": "Guilty Ghosts",
-    "kind": "album",          // "album" | "cancion" | "playlist"
     "year": 2024,
+    "kind": "album",
     "url": "https://open.spotify.com/album/...",
     "note": "para trabajar"
   }
 ]
 ```
+Campos: `title`, `artist`, `year` obligatorios. `kind` (`"album"`, `"cancion"`, `"playlist"`), `url`, `note` opcionales.
 
 ### `peliculas.json`
 ```json
@@ -53,14 +66,15 @@ y aparece en la app **Intereses** del escritorio en el próximo build.
   {
     "title": "Twin Peaks",
     "director": "David Lynch",
-    "kind": "serie",          // "pelicula" | "serie" | "documental"
     "year": 1990,
-    "status": "viendo",       // "viendo" | "vista" | "quiero"
+    "kind": "serie",
+    "status": "viendo",
     "rating": null,
     "note": ""
   }
 ]
 ```
+Campos: `title`, `director`, `year` obligatorios. `kind` (`"pelicula"`, `"serie"`, `"documental"`), `status` (`"viendo"`, `"vista"`, `"quiero"`), `rating`, `note` opcionales.
 
 ### `quotes.json`
 ```json
@@ -74,13 +88,35 @@ y aparece en la app **Intereses** del escritorio en el próximo build.
   }
 ]
 ```
+Campos: `text` y `author` obligatorios. `source`, `date`, `tags` opcionales.
 
-## Cómo añadir
+### `galeria.json`
+```json
+[
+  {
+    "url": "https://res.cloudinary.com/up7czvhe/image/upload/v.../foto.jpg",
+    "caption": "Duero al atardecer",
+    "location": "Oporto",
+    "date": "2026-09-01",
+    "type": "foto"
+  }
+]
+```
+Campos: `url` obligatorio (URL completa de Cloudinary). `caption`, `location`, `date`, `type` (`"foto"` o `"video"`) opcionales.
 
-1. Abre el fichero JSON.
-2. Añade una entrada nueva al array (recuerda la coma entre entradas).
-3. Commit + push. La web se rebuild y aparece.
+Cloudinary optimiza tamaños automáticamente (WebP + lazy load). Solo tienes
+que copiar la URL desde su [dashboard](https://cloudinary.com/console/media_library).
 
-Los campos opcionales se pueden omitir. Si algo falla, mira el schema en
-`src/lib/collections.ts` (aún no existe — se creará cuando el intereses cargue
-estos JSON con validación).
+## Cómo añadir una entrada
+
+1. Abre el fichero JSON (en GitHub web con el botón lápiz, o local en tu editor).
+2. Añade una entrada nueva al array. **No olvides la coma** entre entradas.
+3. Commit + push a `main`. GitHub Actions rebuild ~30-60s. La entrada aparece viva.
+
+Si el build falla (ej: JSON mal formateado, coma que sobra), lo ves en el tab
+**Actions** del repo. El deploy anterior sigue vivo mientras arreglas.
+
+## Ver otras cosas editables
+
+Notas, proyectos ("cosas") y la página "Vida" viven en `src/content/` — mira
+[GUIDE.md](../../GUIDE.md) en la raíz del repo para el workflow completo.
