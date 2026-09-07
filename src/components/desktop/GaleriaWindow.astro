@@ -49,20 +49,36 @@ const thumbUrl = (url: string) =>
 </Window>
 
 <!-- Lightbox modal -->
-<div
-  data-lightbox
-  hidden
-  style="position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; padding: 40px; flex-direction: column; gap: 16px;"
->
-  <button
-    type="button"
-    data-lightbox-close
-    aria-label="Cerrar"
-    style="position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 20px; cursor: pointer;"
-  >×</button>
-  <img data-lightbox-img src="" alt="" style="max-width: min(90vw, 1200px); max-height: 80vh; object-fit: contain; border-radius: 4px;" />
-  <div data-lightbox-caption style="color: #fff; text-align: center; font-size: 14px; opacity: 0.9;"></div>
+<div data-lightbox class="galeria-lightbox">
+  <button type="button" data-lightbox-close aria-label="Cerrar" class="galeria-lightbox-close">×</button>
+  <img data-lightbox-img src="" alt="" />
+  <div data-lightbox-caption></div>
 </div>
+
+<style>
+  .galeria-lightbox {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 40px; flex-direction: column; gap: 16px;
+  }
+  .galeria-lightbox.is-open { display: flex; }
+  .galeria-lightbox-close {
+    position: absolute; top: 20px; right: 20px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: none;
+    color: #fff; font-size: 20px; cursor: pointer;
+  }
+  .galeria-lightbox img {
+    max-width: min(90vw, 1200px); max-height: 80vh;
+    object-fit: contain; border-radius: 4px;
+  }
+  .galeria-lightbox [data-lightbox-caption] {
+    color: #fff; text-align: center; font-size: 14px; opacity: 0.9;
+  }
+</style>
 
 <script>
   const items = document.querySelectorAll<HTMLButtonElement>('[data-galeria-item]');
@@ -76,9 +92,9 @@ const thumbUrl = (url: string) =>
     lbImg.src = btn.dataset.url || '';
     const parts = [btn.dataset.caption, btn.dataset.location, btn.dataset.date].filter(Boolean);
     lbCap.textContent = parts.join(' · ');
-    lightbox.hidden = false;
+    lightbox.classList.add('is-open');
   };
-  const close = () => { if (lightbox) lightbox.hidden = true; };
+  const close = () => { if (lightbox) lightbox.classList.remove('is-open'); };
 
   items.forEach((btn) => btn.addEventListener('click', () => open(btn)));
   lbClose?.addEventListener('click', close);
