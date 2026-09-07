@@ -146,28 +146,43 @@ import { site } from '../../config/site';
       }
       disableSubmit();
       if (msgEl) msgEl.textContent = 'Enviando…';
+      let r, data, errorDetail = '';
       try {
-        const r = await fetch(`${API}/firmas`, {
+        r = await fetch(`${API}/firmas`, {
           method: 'POST',
+          mode: 'cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nombre, mensaje, token: currentToken }),
         });
-        const data = await r.json();
-        if (!r.ok) {
-          if (msgEl) msgEl.textContent = data.error || 'Error al firmar.';
-          currentToken = null;
-          if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
-          return;
-        }
-        if (msgEl) msgEl.textContent = '✓ Gracias por firmar';
-        form.reset();
+      } catch (err) {
+        console.error('[firma] fetch failed:', err);
+        if (msgEl) msgEl.textContent = 'Error de red: ' + (err?.message || 'no se pudo conectar');
+        enableSubmit();
         currentToken = null;
         if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
-        load();
-      } catch {
-        if (msgEl) msgEl.textContent = 'No se pudo enviar. Intenta de nuevo.';
-        enableSubmit();
+        return;
       }
+      try {
+        data = await r.json();
+      } catch (err) {
+        console.error('[firma] json parse failed:', err, 'status:', r?.status);
+        if (msgEl) msgEl.textContent = `Respuesta inesperada (HTTP ${r?.status ?? '?'})`;
+        enableSubmit();
+        currentToken = null;
+        if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+        return;
+      }
+      if (!r.ok) {
+        if (msgEl) msgEl.textContent = `Error (${r.status}): ${data.error || 'no se pudo firmar'}`;
+        currentToken = null;
+        if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+        return;
+      }
+      if (msgEl) msgEl.textContent = '✓ Gracias por firmar';
+      form.reset();
+      currentToken = null;
+      if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+      load();
     });
 
     load();
