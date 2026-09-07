@@ -2,7 +2,7 @@ export const site = {
   name: 'andreipop.org',
   domain: 'andreipop.org',
   author: 'Andrei Pop',
-  bio: '[una línea sobre ti]. Aquí escribo notas, hago cosas y guardo intereses.',
+  bio: 'Hola. Aquí escribo notas, hago cosas y guardo intereses que valen la pena.',
   hero: {
     salutation: 'Hola, soy',
     name: 'Andrei',
