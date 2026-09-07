@@ -1,0 +1,116 @@
+---
+import Window from './Window.astro';
+import { site } from '../../config/site';
+---
+<Window slug="firma" title="Firma — guestbook" x={220} y={130} width={520} height={620} z={100}>
+  <div style="display: flex; flex-direction: column; height: 100%;">
+
+    <!-- Form -->
+    <form data-firma-form style="padding: 24px 24px 20px; border-bottom: 1px solid var(--color-border); display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
+      <div>
+        <h3 style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--color-ink);">Deja tu firma</h3>
+        <p style="margin: 4px 0 0; font-size: 12px; color: var(--color-muted);">Un mensaje corto para dejar constancia de que has pasado por aquí.</p>
+      </div>
+      <input
+        type="text" name="nombre" placeholder="Tu nombre" required maxlength="60"
+        style="padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-ink); font-family: inherit; font-size: 14px; outline: none;"
+      />
+      <textarea
+        name="mensaje" placeholder="Un mensaje (max 500 caracteres)" required maxlength="500" rows="3"
+        style="padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-ink); font-family: inherit; font-size: 14px; resize: vertical; outline: none;"
+      ></textarea>
+      <div class="cf-turnstile" data-sitekey={site.api.turnstileSiteKey} data-theme="auto" data-size="flexible"></div>
+      <button
+        type="submit"
+        style="padding: 10px 16px; background: var(--color-indigo); color: #fff; border: none; border-radius: 999px; font-size: 14px; font-weight: 500; cursor: pointer;"
+      >
+        Firmar
+      </button>
+      <div data-firma-msg style="font-size: 12px; color: var(--color-muted); min-height: 16px;"></div>
+    </form>
+
+    <!-- Lista firmas -->
+    <div style="padding: 16px 24px 8px; flex-shrink: 0;">
+      <div class="cap">Últimas firmas · <span data-firma-count>—</span></div>
+    </div>
+    <div data-firmas-list style="flex: 1; overflow-y: auto; padding: 0 24px 24px;">
+      <div style="text-align: center; color: var(--color-muted); padding: 20px; font-size: 13px;">Cargando…</div>
+    </div>
+
+  </div>
+</Window>
+
+<script define:vars={{ API: site.api.baseUrl }}>
+  const win = document.querySelector('[data-window="firma"]');
+  if (win) {
+    const listEl  = win.querySelector('[data-firmas-list]');
+    const countEl = win.querySelector('[data-firma-count]');
+    const form    = win.querySelector('[data-firma-form]');
+    const msgEl   = win.querySelector('[data-firma-msg]');
+
+    const fmt = (iso) => new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '');
+    const escape = (s) => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const render = (firmas) => {
+      if (countEl) countEl.textContent = String(firmas.length);
+      if (!listEl) return;
+      if (firmas.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center;color:var(--color-muted);padding:20px;font-size:13px;">Todavía nadie ha firmado. Sé el primero.</div>';
+        return;
+      }
+      listEl.innerHTML = firmas.map((f) => `
+        <div style="padding:14px 0;border-top:1px solid var(--color-border);">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:4px;">
+            <strong style="font-size:14px;color:var(--color-ink);">${escape(f.nombre)}</strong>
+            <span class="mono" style="font-size:10px;color:var(--color-muted);">${fmt(f.date)}</span>
+          </div>
+          <div style="font-size:14px;color:var(--color-ink);line-height:1.5;white-space:pre-wrap;">${escape(f.mensaje)}</div>
+        </div>
+      `).join('');
+    };
+
+    const load = async () => {
+      try {
+        const r = await fetch(`${API}/firmas`);
+        const data = await r.json();
+        render(data.firmas || []);
+      } catch {
+        if (listEl) listEl.innerHTML = '<div style="text-align:center;color:var(--color-muted);padding:20px;font-size:13px;">No se pudo cargar. Refresca la página.</div>';
+      }
+    };
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const nombre  = fd.get('nombre');
+      const mensaje = fd.get('mensaje');
+      const token   = fd.get('cf-turnstile-response');
+      if (!token) {
+        if (msgEl) msgEl.textContent = 'Espera a que el widget de verificación cargue.';
+        return;
+      }
+      if (msgEl) msgEl.textContent = 'Enviando…';
+      try {
+        const r = await fetch(`${API}/firmas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, mensaje, token }),
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          if (msgEl) msgEl.textContent = data.error || 'Error al firmar.';
+          window.turnstile?.reset();
+          return;
+        }
+        if (msgEl) msgEl.textContent = 'Gracias por firmar ✓';
+        form.reset();
+        window.turnstile?.reset();
+        load();
+      } catch {
+        if (msgEl) msgEl.textContent = 'No se pudo enviar. Intenta de nuevo.';
+      }
+    });
+
+    load();
+  }
+</script>

@@ -1,0 +1,87 @@
+---
+import Window from './Window.astro';
+import { site } from '../../config/site';
+import galeria from '../../data/galeria.json';
+
+interface Item {
+  url: string;         // URL completa Cloudinary
+  caption?: string;
+  location?: string;
+  date?: string;       // ISO
+  type?: 'foto' | 'video';
+}
+const items = galeria as Item[];
+const thumbUrl = (url: string) =>
+  url.replace('/upload/', '/upload/w_600,c_limit,q_auto,f_auto/');
+---
+<Window slug="galeria" title={`Galería — ${items.length}`} x={160} y={110} width={720} height={560} z={100}>
+  {items.length === 0 ? (
+    <div style="padding: 48px 32px; text-align: center;">
+      <div class="cap" style="margin-bottom: 12px;">Galería</div>
+      <div style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px;">Todavía sin fotos.</div>
+      <p style="font-size: 13px; color: var(--color-muted); margin: 0 0 12px; max-width: 380px; margin-inline: auto; line-height: 1.55;">
+        Sube fotos a <a href="https://cloudinary.com/console/media_library" target="_blank" rel="noopener" style="color: var(--color-indigo);">Cloudinary</a>, copia sus URLs y añádelas a <span class="mono" style="font-size: 12px; padding: 1px 5px; background: var(--color-border); border-radius: 3px;">src/data/galeria.json</span> del repo.
+      </p>
+    </div>
+  ) : (
+    <div style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;">
+      {items.map((it, i) => (
+        <button
+          type="button"
+          data-galeria-item
+          data-url={it.url}
+          data-caption={it.caption ?? ''}
+          data-location={it.location ?? ''}
+          data-date={it.date ?? ''}
+          style="border: none; padding: 0; background: transparent; cursor: pointer; position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 8px;"
+          aria-label={it.caption ?? `Foto ${i + 1}`}
+        >
+          <img
+            src={thumbUrl(it.url)}
+            alt={it.caption ?? ''}
+            loading="lazy"
+            style="width: 100%; height: 100%; object-fit: cover; display: block;"
+          />
+        </button>
+      ))}
+    </div>
+  )}
+</Window>
+
+<!-- Lightbox modal -->
+<div
+  data-lightbox
+  hidden
+  style="position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; padding: 40px; flex-direction: column; gap: 16px;"
+>
+  <button
+    type="button"
+    data-lightbox-close
+    aria-label="Cerrar"
+    style="position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 20px; cursor: pointer;"
+  >×</button>
+  <img data-lightbox-img src="" alt="" style="max-width: min(90vw, 1200px); max-height: 80vh; object-fit: contain; border-radius: 4px;" />
+  <div data-lightbox-caption style="color: #fff; text-align: center; font-size: 14px; opacity: 0.9;"></div>
+</div>
+
+<script>
+  const items = document.querySelectorAll<HTMLButtonElement>('[data-galeria-item]');
+  const lightbox = document.querySelector<HTMLElement>('[data-lightbox]');
+  const lbImg    = document.querySelector<HTMLImageElement>('[data-lightbox-img]');
+  const lbCap    = document.querySelector<HTMLElement>('[data-lightbox-caption]');
+  const lbClose  = document.querySelector<HTMLButtonElement>('[data-lightbox-close]');
+
+  const open = (btn: HTMLButtonElement) => {
+    if (!lightbox || !lbImg || !lbCap) return;
+    lbImg.src = btn.dataset.url || '';
+    const parts = [btn.dataset.caption, btn.dataset.location, btn.dataset.date].filter(Boolean);
+    lbCap.textContent = parts.join(' · ');
+    lightbox.hidden = false;
+  };
+  const close = () => { if (lightbox) lightbox.hidden = true; };
+
+  items.forEach((btn) => btn.addEventListener('click', () => open(btn)));
+  lbClose?.addEventListener('click', close);
+  lightbox?.addEventListener('click', (e) => { if (e.target === lightbox) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+</script>
