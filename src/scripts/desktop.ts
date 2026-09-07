@@ -379,15 +379,30 @@ const phaseAt = (hour: number): PhaseColors => {
   };
 };
 
+const tintDark = (p: PhaseColors) => {
+  // Oscurece la paleta manteniendo posición del astro. Reemplaza el cielo
+  // por gradiente noche y aumenta opacidad de montañas + estrellas.
+  p.top    = '#020617';
+  p.mid1   = '#0c1a3e';
+  p.mid2   = '#1e1b4b';
+  p.bottom = '#312e81';
+  p.stars  = 1;
+  p.glow   = 0.15;
+  p.mtnBack  = 0.6;
+  p.mtnMid   = 0.8;
+  p.mtnFront = 0.95;
+  // El astro sigue en su posición REAL; cambiamos su color a algo lunar.
+  p.astro = '#f1f5f9';
+  p.craters = true;
+};
+
 const applyPhase = () => {
-  // Si el usuario ha forzado modo oscuro, mostramos siempre la fase nocturna.
-  // Modo claro deja al reloj decidir (con la excepción de que si es de noche,
-  // mostramos la fase de anochecer como compromiso).
+  // Posición del sol/luna = hora real del visitante.
+  // El toggle claro/oscuro solo tinta la paleta.
+  const hour = new Date().getHours();
   const theme = document.documentElement.dataset.theme as 'light' | 'dark';
-  let hour = new Date().getHours();
-  if (theme === 'dark') hour = 23;
-  else if (theme === 'light' && (hour >= 22 || hour < 5)) hour = 12;
   const p = phaseAt(hour);
+  if (theme === 'dark') tintDark(p);
   const wp = document.querySelector('[data-wallpaper]');
   if (!wp) return;
   const setStop = (name: string, color: string) => {
