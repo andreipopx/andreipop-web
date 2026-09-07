@@ -15,52 +15,47 @@ const tabs = [
 ];
 ---
 <Window slug="intereses" title="Intereses" x={280} y={100} width={640} height={520} z={100}>
-  <div style="display: flex; flex-direction: column; height: 100%;">
-    <!-- tabs -->
-    <div style="display: flex; gap: 4px; padding: 8px 12px 0; border-bottom: 1px solid #eaecef; flex-shrink: 0; overflow-x: auto;">
+  <div class="int">
+    <div class="int-tabs">
       {tabs.map((t, i) => (
         <button
           type="button"
           data-int-tab={t.id}
-          class:list={['int-tab']}
-          style={`padding: 8px 14px; border: none; background: transparent; font-size: 13px; font-weight: 500; color: ${i === 0 ? '#0f1115' : '#6b7280'}; border-bottom: 2px solid ${i === 0 ? '#1e3a8a' : 'transparent'}; cursor: pointer; white-space: nowrap;`}
-          data-active={i === 0 ? 'true' : 'false'}
+          class:list={['int-tab', { 'is-active': i === 0 }]}
         >
-          {t.label} <span class="mono" style="font-size: 10px; opacity: 0.6;">{t.count}</span>
+          {t.label} <span class="mono int-tab-count">{t.count}</span>
         </button>
       ))}
     </div>
 
-    <!-- panels -->
-    <div style="flex: 1; overflow-y: auto;">
-
-      <div data-int-panel="enlaces" style="padding: 12px;">
+    <div class="int-panels">
+      <div data-int-panel="enlaces" class="int-panel">
         {enlaces.length === 0 ? (
-          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin enlaces.</p>
+          <p class="int-empty">Aún nada por aquí.</p>
         ) : (
-          <ul style="list-style: none; padding: 0; margin: 0;">
+          <ul class="int-list">
             {enlaces.map((e: any) => (
-              <li style="padding: 12px; border-bottom: 1px solid #f3f4f6;">
-                <a href={e.url} target="_blank" rel="noopener" style="color: #1e3a8a; font-weight: 500; font-size: 14px;">{e.title} ↗</a>
-                {e.source && <span style="font-size: 12px; color: #6b7280; margin-left: 8px;">— {e.source}</span>}
-                {e.note && <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0;">{e.note}</p>}
+              <li>
+                <a href={e.url} target="_blank" rel="noopener" class="int-link">{e.title} ↗</a>
+                {e.source && <span class="int-meta"> — {e.source}</span>}
+                {e.note && <p class="int-note">{e.note}</p>}
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      <div data-int-panel="libros" hidden style="padding: 12px;">
+      <div data-int-panel="libros" class="int-panel" hidden>
         {libros.length === 0 ? (
-          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin libros.</p>
+          <p class="int-empty">Aún nada por aquí.</p>
         ) : (
-          <ul style="list-style: none; padding: 0; margin: 0;">
+          <ul class="int-list">
             {libros.map((l: any) => (
-              <li style="padding: 12px; border-bottom: 1px solid #f3f4f6; display: flex; gap: 12px; align-items: baseline;">
-                <span class="mono" style="font-size: 10px; padding: 2px 8px; background: #f3f4f6; color: #4b5563; border-radius: 999px; text-transform: uppercase;">{l.status}</span>
-                <div style="flex: 1;">
-                  <div style="font-weight: 500; font-size: 14px;">{l.title}</div>
-                  <div style="font-size: 12px; color: #6b7280;">{l.author}</div>
+              <li class="int-book">
+                <span class="int-badge">{l.status}</span>
+                <div>
+                  <div class="int-title">{l.title}</div>
+                  <div class="int-meta">{l.author}</div>
                 </div>
               </li>
             ))}
@@ -68,54 +63,118 @@ const tabs = [
         )}
       </div>
 
-      <div data-int-panel="musica" hidden style="padding: 12px;">
+      <div data-int-panel="musica" class="int-panel" hidden>
         {musica.length === 0 ? (
-          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin música.</p>
+          <p class="int-empty">Aún nada por aquí.</p>
         ) : (
-          <ul style="list-style: none; padding: 0; margin: 0;">
+          <ul class="int-list">
             {musica.map((m: any) => (
-              <li style="padding: 12px; border-bottom: 1px solid #f3f4f6;">
-                <div style="font-weight: 500; font-size: 14px;">{m.title}</div>
-                <div style="font-size: 12px; color: #6b7280;">{m.artist} · {m.year}</div>
+              <li>
+                <div class="int-title">{m.title}</div>
+                <div class="int-meta">{m.artist} · {m.year}</div>
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      <div data-int-panel="peliculas" hidden style="padding: 12px;">
+      <div data-int-panel="peliculas" class="int-panel" hidden>
         {peliculas.length === 0 ? (
-          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin películas.</p>
+          <p class="int-empty">Aún nada por aquí.</p>
         ) : (
-          <ul style="list-style: none; padding: 0; margin: 0;">
+          <ul class="int-list">
             {peliculas.map((p: any) => (
-              <li style="padding: 12px; border-bottom: 1px solid #f3f4f6;">
-                <div style="font-weight: 500; font-size: 14px;">{p.title}</div>
-                <div style="font-size: 12px; color: #6b7280;">{p.director} · {p.year}</div>
+              <li>
+                <div class="int-title">{p.title}</div>
+                <div class="int-meta">{p.director} · {p.year}</div>
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      <div data-int-panel="quotes" hidden style="padding: 12px;">
+      <div data-int-panel="quotes" class="int-panel" hidden>
         {quotes.length === 0 ? (
-          <p style="text-align: center; color: #6b7280; padding: 40px; font-size: 13px;">Todavía sin quotes.</p>
+          <p class="int-empty">Aún nada por aquí.</p>
         ) : (
-          <ul style="list-style: none; padding: 0; margin: 0;">
+          <ul class="int-list">
             {quotes.map((q: any) => (
-              <li style="padding: 16px 12px; border-bottom: 1px solid #f3f4f6;">
-                <p style="font-size: 15px; font-style: italic; color: #0f1115; margin: 0; line-height: 1.55;">"{q.text}"</p>
-                <p style="font-size: 12px; color: #6b7280; margin: 8px 0 0;">— {q.author}{q.source && `, ${q.source}`}</p>
+              <li class="int-quote">
+                <p class="int-quote-text">"{q.text}"</p>
+                <p class="int-quote-author">— {q.author}{q.source && `, ${q.source}`}</p>
               </li>
             ))}
           </ul>
         )}
       </div>
-
     </div>
   </div>
 </Window>
+
+<style is:global>
+  [data-window="intereses"] .int { display: flex; flex-direction: column; height: 100%; }
+  [data-window="intereses"] .int-tabs {
+    display: flex; gap: 4px; padding: 8px 12px 0;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0; overflow-x: auto;
+  }
+  [data-window="intereses"] .int-tab {
+    padding: 8px 14px; border: none; background: transparent;
+    font-size: 13px; font-weight: 500;
+    color: var(--color-muted);
+    border-bottom: 2px solid transparent;
+    cursor: pointer; white-space: nowrap;
+  }
+  [data-window="intereses"] .int-tab.is-active {
+    color: var(--color-ink);
+    border-bottom-color: var(--color-indigo);
+  }
+  [data-window="intereses"] .int-tab-count {
+    font-size: 10px; opacity: 0.6;
+  }
+  [data-window="intereses"] .int-panels { flex: 1; overflow-y: auto; }
+  [data-window="intereses"] .int-panel { padding: 12px; }
+  [data-window="intereses"] .int-empty {
+    text-align: center; color: var(--color-muted);
+    padding: 40px; font-size: 13px; margin: 0;
+  }
+  [data-window="intereses"] .int-list { list-style: none; padding: 0; margin: 0; }
+  [data-window="intereses"] .int-list > li {
+    padding: 12px; border-bottom: 1px solid var(--color-border);
+  }
+  [data-window="intereses"] .int-link {
+    color: var(--color-indigo); font-weight: 500; font-size: 14px;
+  }
+  [data-window="intereses"] .int-meta {
+    font-size: 12px; color: var(--color-muted);
+  }
+  [data-window="intereses"] .int-note {
+    font-size: 12px; color: var(--color-muted); margin: 4px 0 0;
+  }
+  [data-window="intereses"] .int-title {
+    font-weight: 500; font-size: 14px; color: var(--color-ink);
+  }
+  [data-window="intereses"] .int-book {
+    display: flex; gap: 12px; align-items: baseline;
+  }
+  [data-window="intereses"] .int-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; padding: 2px 8px;
+    background: var(--color-border); color: var(--color-muted);
+    border-radius: 999px; text-transform: uppercase;
+  }
+  [data-window="intereses"] .int-quote {
+    padding: 16px 12px !important;
+  }
+  [data-window="intereses"] .int-quote-text {
+    font-size: 15px; font-style: italic;
+    color: var(--color-ink);
+    margin: 0; line-height: 1.55;
+  }
+  [data-window="intereses"] .int-quote-author {
+    font-size: 12px; color: var(--color-muted); margin: 8px 0 0;
+  }
+</style>
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-window="intereses"]').forEach((win) => {
@@ -124,11 +183,7 @@ const tabs = [
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         const target = tab.getAttribute('data-int-tab');
-        tabs.forEach((t) => {
-          const active = t === tab;
-          t.style.color = active ? '#0f1115' : '#6b7280';
-          t.style.borderBottomColor = active ? '#1e3a8a' : 'transparent';
-        });
+        tabs.forEach((t) => t.classList.toggle('is-active', t === tab));
         panels.forEach((p) => {
           p.hidden = p.getAttribute('data-int-panel') !== target;
         });
