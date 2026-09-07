@@ -10,19 +10,16 @@ interface Props {
   open?: boolean;
 }
 const {
-  slug,
-  title,
-  x = 120,
-  y = 80,
-  width = 520,
-  height = 480,
-  z = 100,
-  open = false,
+  slug, title,
+  x = 120, y = 80, width = 520, height = 480,
+  z = 100, open = false,
 } = Astro.props;
 ---
 <article
   class="win"
   data-window={slug}
+  data-default-width={width}
+  data-default-height={height}
   hidden={!open}
   style={`left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; z-index: ${z};`}
 >
@@ -33,9 +30,18 @@ const {
       <button type="button" class="tl-max"   aria-label="Maximizar" data-action="max"></button>
     </div>
     <div class="win-title">{title}</div>
-    <div style="width: 46px;" aria-hidden="true"></div>
+    <div style="width: 52px;" aria-hidden="true"></div>
   </header>
   <div class="win-body">
     <slot />
   </div>
+  <!-- Resize handles (desktop only, CSS hides on mobile) -->
+  <span class="win-resize n"  data-resize="n"  aria-hidden="true"></span>
+  <span class="win-resize s"  data-resize="s"  aria-hidden="true"></span>
+  <span class="win-resize e"  data-resize="e"  aria-hidden="true"></span>
+  <span class="win-resize w"  data-resize="w"  aria-hidden="true"></span>
+  <span class="win-resize ne" data-resize="ne" aria-hidden="true"></span>
+  <span class="win-resize nw" data-resize="nw" aria-hidden="true"></span>
+  <span class="win-resize se" data-resize="se" aria-hidden="true"></span>
+  <span class="win-resize sw" data-resize="sw" aria-hidden="true"></span>
 </article>

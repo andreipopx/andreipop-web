@@ -1,31 +1,86 @@
 ---
 /**
- * Wallpaper del escritorio · sunset landscape.
+ * Wallpaper del escritorio · dos versiones (día/noche) que cambian con [data-theme].
  * Fixed detrás de todo. SVG + grain overlay.
  */
 ---
 <div aria-hidden="true" style="position: fixed; inset: 0; z-index: -1; overflow: hidden;">
-  <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" style="width: 100%; height: 100%; display: block;">
+  <!-- DÍA · sunset -->
+  <svg
+    data-wallpaper="light"
+    viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"
+    style="width: 100%; height: 100%; display: block; position: absolute; inset: 0; transition: opacity 0.5s ease-out;"
+  >
     <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="sky-l" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#a5b4fc"/>
         <stop offset="0.35" stop-color="#fbcfe8"/>
         <stop offset="0.65" stop-color="#fed7aa"/>
         <stop offset="1" stop-color="#fdba74"/>
       </linearGradient>
-      <radialGradient id="sunglow" cx="0.7" cy="0.65" r="0.35">
+      <radialGradient id="sunglow-l" cx="0.7" cy="0.65" r="0.35">
         <stop offset="0" stop-color="#fef3c7" stop-opacity="0.7"/>
         <stop offset="1" stop-color="#fef3c7" stop-opacity="0"/>
       </radialGradient>
     </defs>
-    <rect width="1600" height="1000" fill="url(#sky)"/>
-    <rect width="1600" height="1000" fill="url(#sunglow)"/>
+    <rect width="1600" height="1000" fill="url(#sky-l)"/>
+    <rect width="1600" height="1000" fill="url(#sunglow-l)"/>
     <circle cx="1120" cy="620" r="55" fill="#fbbf24" opacity="0.9"/>
     <circle cx="1120" cy="620" r="80" fill="#fbbf24" opacity="0.25"/>
     <path d="M0 700 L200 620 L400 680 L700 580 L900 640 L1200 600 L1600 660 L1600 1000 L0 1000 Z" fill="#7c3aed" opacity="0.3"/>
     <path d="M0 780 L150 720 L350 770 L600 700 L850 750 L1100 720 L1400 760 L1600 730 L1600 1000 L0 1000 Z" fill="#5b21b6" opacity="0.5"/>
     <path d="M0 870 L200 830 L500 860 L800 820 L1100 850 L1400 830 L1600 850 L1600 1000 L0 1000 Z" fill="#1e1b4b" opacity="0.75"/>
   </svg>
+
+  <!-- NOCHE · midnight -->
+  <svg
+    data-wallpaper="dark"
+    viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"
+    style="width: 100%; height: 100%; display: block; position: absolute; inset: 0; opacity: 0; transition: opacity 0.5s ease-out;"
+  >
+    <defs>
+      <linearGradient id="sky-d" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#020617"/>
+        <stop offset="0.4" stop-color="#0c1a3e"/>
+        <stop offset="0.75" stop-color="#1e1b4b"/>
+        <stop offset="1" stop-color="#312e81"/>
+      </linearGradient>
+      <radialGradient id="moonglow" cx="0.72" cy="0.28" r="0.18">
+        <stop offset="0" stop-color="#e0e7ff" stop-opacity="0.35"/>
+        <stop offset="1" stop-color="#e0e7ff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1600" height="1000" fill="url(#sky-d)"/>
+    <rect width="1600" height="1000" fill="url(#moonglow)"/>
+    <!-- stars -->
+    <g fill="#e0e7ff">
+      <circle cx="180" cy="130" r="1.2" opacity="0.9"/>
+      <circle cx="320" cy="80"  r="0.8" opacity="0.7"/>
+      <circle cx="450" cy="200" r="1"   opacity="0.8"/>
+      <circle cx="600" cy="90"  r="0.9" opacity="0.6"/>
+      <circle cx="780" cy="180" r="1.4" opacity="0.9"/>
+      <circle cx="900" cy="60"  r="0.7" opacity="0.7"/>
+      <circle cx="1050" cy="140" r="1"  opacity="0.8"/>
+      <circle cx="1250" cy="90" r="0.9" opacity="0.6"/>
+      <circle cx="1400" cy="180" r="1.2" opacity="0.9"/>
+      <circle cx="1520" cy="120" r="0.8" opacity="0.7"/>
+      <circle cx="80"   cy="260" r="0.9" opacity="0.7"/>
+      <circle cx="250"  cy="320" r="1.1" opacity="0.8"/>
+      <circle cx="530"  cy="380" r="0.7" opacity="0.6"/>
+      <circle cx="1180" cy="340" r="1"   opacity="0.75"/>
+      <circle cx="1330" cy="290" r="0.8" opacity="0.7"/>
+    </g>
+    <!-- moon -->
+    <circle cx="1150" cy="240" r="52" fill="#f1f5f9" opacity="0.95"/>
+    <circle cx="1165" cy="228" r="6"  fill="#cbd5e1" opacity="0.5"/>
+    <circle cx="1135" cy="256" r="4"  fill="#cbd5e1" opacity="0.5"/>
+    <circle cx="1170" cy="260" r="3"  fill="#cbd5e1" opacity="0.4"/>
+    <!-- mountains -->
+    <path d="M0 700 L200 620 L400 680 L700 580 L900 640 L1200 600 L1600 660 L1600 1000 L0 1000 Z" fill="#1e1b4b" opacity="0.7"/>
+    <path d="M0 780 L150 720 L350 770 L600 700 L850 750 L1100 720 L1400 760 L1600 730 L1600 1000 L0 1000 Z" fill="#0f0e2a" opacity="0.85"/>
+    <path d="M0 870 L200 830 L500 860 L800 820 L1100 850 L1400 830 L1600 850 L1600 1000 L0 1000 Z" fill="#050416" opacity="0.95"/>
+  </svg>
+
   <svg style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.4; mix-blend-mode: overlay;" preserveAspectRatio="none">
     <filter id="grain-wp"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.5 0"/></filter>
     <rect width="100%" height="100%" filter="url(#grain-wp)"/>
