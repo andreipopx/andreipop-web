@@ -1,0 +1,102 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Reacciones from '../../components/Reacciones.astro';
+import Comentarios from '../../components/Comentarios.astro';
+import { site } from '../../config/site';
+
+export async function getStaticPaths() {
+  const notas = await getCollection('notas', ({ data }) => !data.draft);
+  return notas.map((n) => ({ params: { slug: n.id }, props: { nota: n } }));
+}
+
+const { nota } = Astro.props;
+const { Content } = await render(nota);
+const fmt = new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).format(nota.data.date);
+---
+<Layout title={nota.data.title} description={nota.data.excerpt ?? nota.data.title}>
+  <article class="nota-page">
+    <header class="nota-head">
+      <a href="/" class="back">← Volver al escritorio</a>
+      <h1>{nota.data.title}</h1>
+      <div class="meta">
+        <time datetime={nota.data.date.toISOString()}>{fmt}</time>
+        {nota.data.kind !== 'nota' && <span class="kind">· {nota.data.kind}</span>}
+      </div>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <Reacciones slug={nota.id} />
+    <Comentarios slug={nota.id} />
+
+    <footer class="nota-foot">
+      <a href="/" class="back">← Volver al escritorio</a>
+    </footer>
+  </article>
+</Layout>
+
+<style>
+  .nota-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    min-height: 100dvh;
+    font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  }
+  .back {
+    display: inline-block;
+    font-size: 13px;
+    color: var(--color-muted);
+    text-decoration: none;
+    margin-bottom: 32px;
+    transition: color 0.15s ease-out;
+  }
+  .back:hover { color: var(--color-indigo); }
+  .nota-head h1 {
+    font-size: 34px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--color-ink);
+  }
+  .meta {
+    font-size: 13px;
+    color: var(--color-muted);
+    margin-bottom: 40px;
+  }
+  .kind { text-transform: lowercase; }
+  .prose :global(p) { font-size: 17px; line-height: 1.65; margin: 0 0 20px; }
+  .prose :global(a) { color: var(--color-indigo); text-decoration: underline; text-underline-offset: 3px; }
+  .prose :global(h2) { font-size: 22px; margin: 40px 0 12px; letter-spacing: -0.015em; }
+  .prose :global(h3) { font-size: 18px; margin: 28px 0 10px; }
+  .prose :global(img) { max-width: 100%; height: auto; border-radius: 8px; margin: 24px 0; }
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--color-indigo);
+    padding-left: 16px;
+    margin: 24px 0;
+    color: var(--color-muted);
+    font-style: italic;
+  }
+  .prose :global(code) {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 0.9em;
+    background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .prose :global(pre) {
+    background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 24px 0;
+  }
+  .prose :global(pre code) { background: none; padding: 0; }
+  .nota-foot { margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--color-border); }
+</style>

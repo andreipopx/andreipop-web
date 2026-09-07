@@ -1,0 +1,185 @@
+---
+import { site } from '../config/site';
+export interface Props { slug: string; }
+const { slug } = Astro.props;
+---
+<section class="comentarios" data-comentarios data-slug={slug}>
+  <div class="cap">Comentarios · <span data-cm-count>—</span></div>
+
+  <form data-cm-form class="cm-form">
+    <input type="text" name="nombre" placeholder="Tu nombre" required maxlength="60" />
+    <textarea name="mensaje" placeholder="Escribe algo (máx 800 caracteres)" required maxlength="800" rows="3"></textarea>
+    <div class="cm-turnstile" data-turnstile-container>
+      <div class="cm-status" data-turnstile-status>Cargando verificación…</div>
+    </div>
+    <div class="cm-actions">
+      <button type="submit" data-cm-submit disabled>Comentar</button>
+      <span class="cm-msg" data-cm-msg></span>
+    </div>
+  </form>
+
+  <div data-cm-list class="cm-list">
+    <div class="cm-empty">Cargando…</div>
+  </div>
+</section>
+
+<style>
+  .comentarios { margin: 48px 0 0; }
+  .cap {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--color-muted); font-weight: 500; margin-bottom: 16px;
+  }
+  .cm-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+  .cm-form input, .cm-form textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: inherit; font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s ease-out;
+  }
+  .cm-form input:focus, .cm-form textarea:focus { border-color: var(--color-indigo); }
+  .cm-form textarea { resize: vertical; min-height: 68px; }
+  .cm-turnstile { min-height: 65px; display: flex; align-items: center; }
+  .cm-status { font-size: 12px; color: var(--color-muted); }
+  .cm-actions { display: flex; align-items: center; gap: 12px; }
+  .cm-actions button {
+    padding: 8px 18px;
+    background: var(--color-indigo); color: #fff;
+    border: none; border-radius: 999px;
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer; opacity: 0.6;
+    transition: opacity 0.15s ease-out, transform 0.12s ease-out;
+  }
+  .cm-actions button:not(:disabled) { opacity: 1; }
+  .cm-actions button:not(:disabled):hover { transform: translateY(-1px); }
+  .cm-msg { font-size: 12px; color: var(--color-muted); }
+  .cm-list { display: flex; flex-direction: column; }
+  .cm-item {
+    padding: 16px 0;
+    border-top: 1px solid var(--color-border);
+  }
+  .cm-item:first-child { border-top: none; }
+  .cm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .cm-name { font-size: 14px; font-weight: 600; color: var(--color-ink); }
+  .cm-date { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; color: var(--color-muted); }
+  .cm-body { font-size: 14px; line-height: 1.55; color: var(--color-ink); white-space: pre-wrap; }
+  .cm-empty { text-align: center; color: var(--color-muted); padding: 24px; font-size: 13px; }
+</style>
+
+<script define:vars={{ API: site.api.baseUrl, SITE_KEY: site.api.turnstileSiteKey }}>
+  document.querySelectorAll('[data-comentarios]').forEach((root) => {
+    const slug = root.dataset.slug;
+    const form = root.querySelector('[data-cm-form]');
+    const listEl = root.querySelector('[data-cm-list]');
+    const countEl = root.querySelector('[data-cm-count]');
+    const msgEl = root.querySelector('[data-cm-msg]');
+    const submitBtn = root.querySelector('[data-cm-submit]');
+    const container = root.querySelector('[data-turnstile-container]');
+    const statusEl = root.querySelector('[data-turnstile-status]');
+
+    let currentToken = null;
+    let widgetId = null;
+
+    const fmt = (iso) => new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '');
+    const escape = (s) => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const enable = () => { if (submitBtn) submitBtn.disabled = false; };
+    const disable = () => { if (submitBtn) submitBtn.disabled = true; };
+
+    const renderTurnstile = () => {
+      if (!window.turnstile || !container) return;
+      container.innerHTML = '';
+      widgetId = window.turnstile.render(container, {
+        sitekey: SITE_KEY,
+        theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
+        callback: (t) => { currentToken = t; enable(); if (statusEl) statusEl.textContent = ''; },
+        'expired-callback': () => { currentToken = null; disable(); },
+        'error-callback': () => { currentToken = null; disable(); if (msgEl) msgEl.textContent = 'Error de verificación.'; },
+      });
+    };
+    const waitForTurnstile = () => {
+      if (window.turnstile) return renderTurnstile();
+      let tries = 0;
+      const iv = setInterval(() => {
+        if (window.turnstile || tries++ > 50) {
+          clearInterval(iv);
+          if (window.turnstile) renderTurnstile();
+          else if (statusEl) statusEl.textContent = 'No se pudo cargar la verificación anti-bot.';
+        }
+      }, 200);
+    };
+    waitForTurnstile();
+
+    const render = (comentarios) => {
+      if (countEl) countEl.textContent = String(comentarios.length);
+      if (!listEl) return;
+      if (comentarios.length === 0) {
+        listEl.innerHTML = '<div class="cm-empty">Todavía no hay comentarios. Sé el primero.</div>';
+        return;
+      }
+      listEl.innerHTML = comentarios.map((c) => `
+        <div class="cm-item">
+          <div class="cm-head">
+            <span class="cm-name">${escape(c.nombre)}</span>
+            <span class="cm-date">${fmt(c.date)}</span>
+          </div>
+          <div class="cm-body">${escape(c.mensaje)}</div>
+        </div>
+      `).join('');
+    };
+
+    const load = async () => {
+      try {
+        const r = await fetch(`${API}/comentarios/${encodeURIComponent(slug)}`);
+        const data = await r.json();
+        render(data.comentarios || []);
+      } catch {
+        if (listEl) listEl.innerHTML = '<div class="cm-empty">No se pudieron cargar los comentarios.</div>';
+      }
+    };
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const nombre = fd.get('nombre');
+      const mensaje = fd.get('mensaje');
+      if (!currentToken) {
+        if (msgEl) msgEl.textContent = 'Espera a que cargue la verificación.';
+        return;
+      }
+      disable();
+      if (msgEl) msgEl.textContent = 'Enviando…';
+      let r, data;
+      try {
+        r = await fetch(`${API}/comentarios/${encodeURIComponent(slug)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, mensaje, token: currentToken }),
+        });
+        data = await r.json();
+      } catch (err) {
+        if (msgEl) msgEl.textContent = 'Error de red. Inténtalo de nuevo.';
+        enable();
+        currentToken = null;
+        if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+        return;
+      }
+      if (!r.ok) {
+        if (msgEl) msgEl.textContent = `Error: ${data.error || 'no se pudo comentar'}`;
+        currentToken = null;
+        if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+        return;
+      }
+      if (msgEl) msgEl.textContent = '✓ Comentario publicado';
+      form.reset();
+      currentToken = null;
+      if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+      load();
+    });
+
+    load();
+  });
+</script>

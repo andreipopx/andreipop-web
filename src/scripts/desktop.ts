@@ -221,6 +221,8 @@ const openNote = (slug: string) => {
     body.innerHTML = '';
     body.appendChild(tpl.content.cloneNode(true));
   }
+  const permalink = noteWin.querySelector<HTMLAnchorElement>('[data-note-permalink]');
+  if (permalink) permalink.href = `/notas/${encodeURIComponent(slug)}`;
   // Update title bar
   const barTitle = noteWin.querySelector<HTMLElement>('.win-title');
   if (barTitle) barTitle.textContent = tpl.getAttribute('data-note-title') || 'Nota';

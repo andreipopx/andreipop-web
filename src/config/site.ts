@@ -11,7 +11,7 @@ export const site = {
   social: {
     github: 'https://github.com/andreipopx',
     linkedin: '#',
-    email: null as string | null,
+    email: 'hola@andreipop.org' as string | null,
     rss: '/rss.xml',
   },
 

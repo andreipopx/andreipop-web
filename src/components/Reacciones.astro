@@ -1,0 +1,99 @@
+---
+import { site } from '../config/site';
+export interface Props { slug: string; }
+const { slug } = Astro.props;
+const emojis = ['❤️','🔥','👏','🤔','😂','🎉'];
+---
+<section class="reacciones" data-reacciones data-slug={slug}>
+  <div class="cap">Reacciones</div>
+  <div class="rx-row">
+    {emojis.map((e) => (
+      <button type="button" class="rx-btn" data-emoji={e}>
+        <span class="rx-emoji">{e}</span>
+        <span class="rx-count" data-count={e}>0</span>
+      </button>
+    ))}
+  </div>
+</section>
+
+<style>
+  .reacciones { margin: 48px 0 0; }
+  .cap {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--color-muted); font-weight: 500; margin-bottom: 12px;
+  }
+  .rx-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .rx-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-family: inherit; font-size: 14px;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: transform 0.12s ease-out, background 0.15s ease-out, border-color 0.15s ease-out;
+  }
+  .rx-btn:hover { background: color-mix(in srgb, var(--color-indigo) 8%, transparent); border-color: var(--color-indigo); }
+  .rx-btn:active { transform: scale(0.94); }
+  .rx-btn.is-mine { background: color-mix(in srgb, var(--color-indigo) 12%, transparent); border-color: var(--color-indigo); }
+  .rx-btn.pop { animation: rx-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes rx-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+  .rx-emoji { font-size: 16px; line-height: 1; }
+  .rx-count { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; color: var(--color-muted); min-width: 12px; text-align: right; }
+  .rx-btn.is-mine .rx-count { color: var(--color-indigo); font-weight: 600; }
+</style>
+
+<script define:vars={{ API: site.api.baseUrl }}>
+  document.querySelectorAll('[data-reacciones]').forEach((root) => {
+    const slug = root.dataset.slug;
+    const storageKey = `rx:${slug}`;
+    const mine = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+
+    const paintCounts = (cuentas) => {
+      root.querySelectorAll('.rx-btn').forEach((btn) => {
+        const emoji = btn.dataset.emoji;
+        const n = cuentas[emoji] || 0;
+        const countEl = btn.querySelector('.rx-count');
+        if (countEl) countEl.textContent = String(n);
+        btn.classList.toggle('is-mine', mine.has(emoji));
+      });
+    };
+
+    const load = async () => {
+      try {
+        const r = await fetch(`${API}/reacciones/${encodeURIComponent(slug)}`);
+        const data = await r.json();
+        paintCounts(data.cuentas || {});
+      } catch {}
+    };
+
+    root.querySelectorAll('.rx-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const emoji = btn.dataset.emoji;
+        if (mine.has(emoji)) return; // El Worker limita a 1 por IP+slug+emoji/24h; evitamos el POST
+        btn.classList.add('pop');
+        setTimeout(() => btn.classList.remove('pop'), 350);
+        try {
+          const r = await fetch(`${API}/reacciones/${encodeURIComponent(slug)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emoji }),
+          });
+          const data = await r.json();
+          if (r.ok) {
+            mine.add(emoji);
+            localStorage.setItem(storageKey, JSON.stringify([...mine]));
+            paintCounts(data.cuentas || {});
+          }
+        } catch {}
+      });
+    });
+
+    load();
+  });
+</script>
