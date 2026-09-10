@@ -16,16 +16,15 @@ import { site } from '../../config/site';
         name="mensaje" placeholder="Un mensaje" required maxlength="500" rows="2"
         style="padding: 9px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-ink); font-family: inherit; font-size: 14px; resize: vertical; outline: none; min-height: 60px;"
       ></textarea>
+      <!-- Turnstile invisible: sólo se muestra si Cloudflare necesita reto -->
+      <div data-turnstile-container class="firma-turnstile"></div>
       <div class="firma-form-row">
-        <!-- Turnstile widget renderizado con explicit callback -->
-        <div data-turnstile-container class="firma-turnstile">
-          <div style="font-size: 11px; color: var(--color-muted);" data-turnstile-status>Cargando verificación…</div>
-        </div>
+        <span data-turnstile-status class="firma-status">Verificando…</span>
         <button
           type="submit"
           data-firma-submit
           disabled
-          style="padding: 9px 18px; background: var(--color-indigo); color: #fff; border: none; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; opacity: 0.6; white-space: nowrap;"
+          style="padding: 9px 20px; background: var(--color-indigo); color: #fff; border: none; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; opacity: 0.6; white-space: nowrap;"
         >
           Firmar
         </button>
@@ -49,16 +48,18 @@ import { site } from '../../config/site';
   .firma-shell { display: flex; flex-direction: column; height: 100%; }
   .firma-list { flex: 1; overflow-y: auto; min-height: 0; }
 
-  /* Form: fila horizontal Turnstile + botón (aprovecha ancho, ahorra alto) */
+  /* Form: fila con botón alineado a la derecha */
   .firma-form-row {
     display: flex; align-items: center; gap: 12px;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
-  .firma-turnstile {
-    min-height: 30px;
-    display: flex; align-items: center;
+  .firma-status {
+    font-size: 11px; color: var(--color-muted);
     flex: 1;
   }
+  /* Turnstile invisible: sin ocupar espacio salvo que aparezca un reto */
+  .firma-turnstile:empty { display: none; }
+  .firma-turnstile { display: flex; justify-content: center; }
 
   /* Firmas: más presencia, más aire, tipografía más grande */
   :global(.firma-item) {
@@ -88,8 +89,6 @@ import { site } from '../../config/site';
   @media (max-width: 768px) {
     .firma-shell { display: block; height: auto; }
     .firma-list { flex: none; overflow: visible; }
-    .firma-form-row { flex-direction: column; align-items: stretch; gap: 10px; }
-    .firma-turnstile { justify-content: flex-start; }
   }
 </style>
 
@@ -124,7 +123,7 @@ import { site } from '../../config/site';
       widgetId = window.turnstile.render(container, {
         sitekey: SITE_KEY,
         theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
-        size: 'compact',
+        appearance: 'interaction-only',
         callback: (token) => {
           currentToken = token;
           enableSubmit();

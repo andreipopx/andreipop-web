@@ -9,9 +9,8 @@ const { slug } = Astro.props;
   <form data-cm-form class="cm-form">
     <input type="text" name="nombre" placeholder="Tu nombre" required maxlength="60" />
     <textarea name="mensaje" placeholder="Escribe algo (máx 800 caracteres)" required maxlength="800" rows="3"></textarea>
-    <div class="cm-turnstile" data-turnstile-container>
-      <div class="cm-status" data-turnstile-status>Cargando verificación…</div>
-    </div>
+    <div class="cm-turnstile" data-turnstile-container></div>
+    <div class="cm-status" data-turnstile-status>Verificando…</div>
     <div class="cm-actions">
       <button type="submit" data-cm-submit disabled>Comentar</button>
       <span class="cm-msg" data-cm-msg></span>
@@ -42,8 +41,9 @@ const { slug } = Astro.props;
   }
   .cm-form input:focus, .cm-form textarea:focus { border-color: var(--color-indigo); }
   .cm-form textarea { resize: vertical; min-height: 68px; }
-  .cm-turnstile { min-height: 65px; display: flex; align-items: center; }
-  .cm-status { font-size: 12px; color: var(--color-muted); }
+  .cm-turnstile:empty { display: none; }
+  .cm-turnstile { display: flex; justify-content: center; margin: 4px 0; }
+  .cm-status { font-size: 11px; color: var(--color-muted); min-height: 14px; }
   .cm-actions { display: flex; align-items: center; gap: 12px; }
   .cm-actions button {
     padding: 8px 18px;
@@ -95,6 +95,7 @@ const { slug } = Astro.props;
       widgetId = window.turnstile.render(container, {
         sitekey: SITE_KEY,
         theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
+        appearance: 'interaction-only',
         callback: (t) => { currentToken = t; enable(); if (statusEl) statusEl.textContent = ''; },
         'expired-callback': () => { currentToken = null; disable(); },
         'error-callback': () => { currentToken = null; disable(); if (msgEl) msgEl.textContent = 'Error de verificación.'; },

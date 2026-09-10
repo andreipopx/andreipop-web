@@ -65,6 +65,47 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
+   Scrollbars custom (finos, translúcidos, con hover)
+   ───────────────────────────────────────────────────────────── */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(30, 58, 138, 0.28) transparent;
+}
+:root[data-theme='dark'] * {
+  scrollbar-color: rgba(147, 197, 253, 0.28) transparent;
+}
+
+/* Webkit / Blink */
+::-webkit-scrollbar {
+  width: 10px; height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(30, 58, 138, 0.22);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background 0.15s ease-out;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 58, 138, 0.45);
+  background-clip: content-box;
+}
+::-webkit-scrollbar-corner { background: transparent; }
+:root[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(147, 197, 253, 0.22);
+  background-clip: content-box;
+}
+:root[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 197, 253, 0.45);
+  background-clip: content-box;
+}
+
+/* ─────────────────────────────────────────────────────────────
    Window
    ───────────────────────────────────────────────────────────── */
 
