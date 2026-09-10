@@ -13,6 +13,9 @@
   --color-border: #eaecef;
   --color-indigo: #1e3a8a;
   --color-indigo-hover: #1d4ed8;
+  --scrollbar-thumb: rgba(30, 58, 138, 0.22);
+  --scrollbar-thumb-hover: rgba(30, 58, 138, 0.45);
+  --scrollbar-thumb-active: rgba(30, 58, 138, 0.6);
   --color-win-bg: rgba(255,255,255,0.9);
   --color-win-bar: rgba(255,255,255,0.6);
   --color-win-border: rgba(255,255,255,0.5);
@@ -33,6 +36,9 @@
   --color-border: rgba(255,255,255,0.08);
   --color-indigo: #93c5fd;
   --color-indigo-hover: #bfdbfe;
+  --scrollbar-thumb: rgba(147, 197, 253, 0.22);
+  --scrollbar-thumb-hover: rgba(147, 197, 253, 0.45);
+  --scrollbar-thumb-active: rgba(147, 197, 253, 0.6);
   --color-win-bg: rgba(20,24,31,0.88);
   --color-win-bar: rgba(20,24,31,0.7);
   --color-win-border: rgba(255,255,255,0.08);
@@ -66,44 +72,34 @@
 
 /* ─────────────────────────────────────────────────────────────
    Scrollbars custom (finos, translúcidos, con hover)
+   Tokens definidos en :root — se adaptan solos al theme.
    ───────────────────────────────────────────────────────────── */
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(30, 58, 138, 0.28) transparent;
-}
-:root[data-theme='dark'] * {
-  scrollbar-color: rgba(147, 197, 253, 0.28) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 /* Webkit / Blink */
-::-webkit-scrollbar {
-  width: 10px; height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(30, 58, 138, 0.22);
+  background: var(--scrollbar-thumb);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
   transition: background 0.15s ease-out;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(30, 58, 138, 0.45);
+  background: var(--scrollbar-thumb-hover);
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:active {
+  background: var(--scrollbar-thumb-active);
   background-clip: content-box;
 }
 ::-webkit-scrollbar-corner { background: transparent; }
-:root[data-theme='dark'] ::-webkit-scrollbar-thumb {
-  background: rgba(147, 197, 253, 0.22);
-  background-clip: content-box;
-}
-:root[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
-  background: rgba(147, 197, 253, 0.45);
-  background-clip: content-box;
-}
 
 /* ─────────────────────────────────────────────────────────────
    Window
