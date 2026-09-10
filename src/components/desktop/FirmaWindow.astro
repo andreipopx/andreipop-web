@@ -6,32 +6,31 @@ import { site } from '../../config/site';
   <div class="firma-shell">
 
     <!-- Form -->
-    <form data-firma-form style="padding: 24px 24px 20px; border-bottom: 1px solid var(--color-border); display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;">
-      <div>
-        <h3 style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--color-ink);">Deja tu firma</h3>
-        <p style="margin: 4px 0 0; font-size: 12px; color: var(--color-muted);">Un mensaje corto para dejar constancia de que has pasado por aquí.</p>
-      </div>
+    <form data-firma-form style="padding: 18px 24px 16px; border-bottom: 1px solid var(--color-border); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0;">
+      <div class="cap" style="margin-bottom: 2px;">Deja tu firma</div>
       <input
         type="text" name="nombre" placeholder="Tu nombre" required maxlength="60"
-        style="padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-ink); font-family: inherit; font-size: 14px; outline: none;"
+        style="padding: 9px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-ink); font-family: inherit; font-size: 14px; outline: none;"
       />
       <textarea
-        name="mensaje" placeholder="Un mensaje (max 500 caracteres)" required maxlength="500" rows="3"
-        style="padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-ink); font-family: inherit; font-size: 14px; resize: vertical; outline: none;"
+        name="mensaje" placeholder="Un mensaje" required maxlength="500" rows="2"
+        style="padding: 9px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-ink); font-family: inherit; font-size: 14px; resize: vertical; outline: none; min-height: 60px;"
       ></textarea>
-      <!-- Turnstile widget renderizado con explicit callback -->
-      <div data-turnstile-container style="min-height: 65px; display: flex; align-items: center; justify-content: center;">
-        <div style="font-size: 12px; color: var(--color-muted);" data-turnstile-status>Cargando verificación…</div>
+      <div class="firma-form-row">
+        <!-- Turnstile widget renderizado con explicit callback -->
+        <div data-turnstile-container class="firma-turnstile">
+          <div style="font-size: 11px; color: var(--color-muted);" data-turnstile-status>Cargando verificación…</div>
+        </div>
+        <button
+          type="submit"
+          data-firma-submit
+          disabled
+          style="padding: 9px 18px; background: var(--color-indigo); color: #fff; border: none; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; opacity: 0.6; white-space: nowrap;"
+        >
+          Firmar
+        </button>
       </div>
-      <button
-        type="submit"
-        data-firma-submit
-        disabled
-        style="padding: 10px 16px; background: var(--color-indigo); color: #fff; border: none; border-radius: 999px; font-size: 14px; font-weight: 500; cursor: pointer; opacity: 0.6;"
-      >
-        Firmar
-      </button>
-      <div data-firma-msg style="font-size: 12px; color: var(--color-muted); min-height: 16px;"></div>
+      <div data-firma-msg style="font-size: 11px; color: var(--color-muted); min-height: 14px;"></div>
     </form>
 
     <!-- Lista firmas -->
@@ -50,10 +49,47 @@ import { site } from '../../config/site';
   .firma-shell { display: flex; flex-direction: column; height: 100%; }
   .firma-list { flex: 1; overflow-y: auto; min-height: 0; }
 
+  /* Form: fila horizontal Turnstile + botón (aprovecha ancho, ahorra alto) */
+  .firma-form-row {
+    display: flex; align-items: center; gap: 12px;
+    justify-content: space-between;
+  }
+  .firma-turnstile {
+    min-height: 30px;
+    display: flex; align-items: center;
+    flex: 1;
+  }
+
+  /* Firmas: más presencia, más aire, tipografía más grande */
+  :global(.firma-item) {
+    padding: 18px 0;
+    border-top: 1px solid var(--color-border);
+  }
+  :global(.firma-item:first-child) { border-top: none; padding-top: 8px; }
+  :global(.firma-item-head) {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 12px; margin-bottom: 6px;
+  }
+  :global(.firma-item-name) {
+    font-size: 15px; font-weight: 600;
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
+  }
+  :global(.firma-item-date) {
+    font-size: 10px; color: var(--color-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  :global(.firma-item-body) {
+    font-size: 15px; color: var(--color-ink);
+    line-height: 1.55; white-space: pre-wrap;
+  }
+
   /* Mobile: sin scroll anidado — scrollea la propia ventana */
   @media (max-width: 768px) {
     .firma-shell { display: block; height: auto; }
     .firma-list { flex: none; overflow: visible; }
+    .firma-form-row { flex-direction: column; align-items: stretch; gap: 10px; }
+    .firma-turnstile { justify-content: flex-start; }
   }
 </style>
 
@@ -88,6 +124,7 @@ import { site } from '../../config/site';
       widgetId = window.turnstile.render(container, {
         sitekey: SITE_KEY,
         theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
+        size: 'compact',
         callback: (token) => {
           currentToken = token;
           enableSubmit();
@@ -127,12 +164,12 @@ import { site } from '../../config/site';
         return;
       }
       listEl.innerHTML = firmas.map((f) => `
-        <div style="padding:14px 0;border-top:1px solid var(--color-border);">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:4px;">
-            <strong style="font-size:14px;color:var(--color-ink);">${escape(f.nombre)}</strong>
-            <span class="mono" style="font-size:10px;color:var(--color-muted);">${fmt(f.date)}</span>
+        <div class="firma-item">
+          <div class="firma-item-head">
+            <strong class="firma-item-name">${escape(f.nombre)}</strong>
+            <span class="mono firma-item-date">${fmt(f.date)}</span>
           </div>
-          <div style="font-size:14px;color:var(--color-ink);line-height:1.5;white-space:pre-wrap;">${escape(f.mensaje)}</div>
+          <div class="firma-item-body">${escape(f.mensaje)}</div>
         </div>
       `).join('');
     };
