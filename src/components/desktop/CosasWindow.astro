@@ -16,7 +16,7 @@ const gradients: Record<string, string> = {
 
 const host = (url: string) => new URL(url).host.replace(/^www\./, '');
 ---
-<Window slug="cosas" title={`Cosas — ${cosas.length}`} x={200} y={140} width={720} height={560} z={100}>
+<Window slug="cosas" title={`Cosas — ${cosas.length}`} x={200} y={140} width={720} height={640} z={100}>
   {cosas.length === 0 ? (
     <div style="padding: 48px 32px; text-align: center;">
       <div class="cap" style="margin-bottom: 12px;">Cosas</div>
