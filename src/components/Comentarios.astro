@@ -3,16 +3,16 @@ import { site } from '../config/site';
 export interface Props { slug: string; }
 const { slug } = Astro.props;
 ---
-<section class="comentarios" data-comentarios data-slug={slug}>
+<section class="comentarios" data-comentarios data-slug={slug} data-api={site.api.baseUrl} data-sitekey={site.api.turnstileSiteKey}>
   <div class="cap">Comentarios · <span data-cm-count>—</span></div>
 
   <form data-cm-form class="cm-form">
     <input type="text" name="nombre" placeholder="Tu nombre" required maxlength="60" />
     <textarea name="mensaje" placeholder="Escribe algo (máx 800 caracteres)" required maxlength="800" rows="3"></textarea>
     <div class="cm-turnstile" data-turnstile-container></div>
-    <div class="cm-status" data-turnstile-status>Verificando…</div>
+    <div class="cm-status" data-turnstile-status></div>
     <div class="cm-actions">
-      <button type="submit" data-cm-submit disabled>Comentar</button>
+      <button type="submit" data-cm-submit>Comentar</button>
       <span class="cm-msg" data-cm-msg></span>
     </div>
   </form>
@@ -57,66 +57,54 @@ const { slug } = Astro.props;
   .cm-actions button:not(:disabled):hover { transform: translateY(-1px); }
   .cm-msg { font-size: 12px; color: var(--color-muted); }
   .cm-list { display: flex; flex-direction: column; }
-  .cm-item {
+  :global(.cm-item) {
     padding: 16px 0;
     border-top: 1px solid var(--color-border);
   }
-  .cm-item:first-child { border-top: none; }
-  .cm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; }
-  .cm-name { font-size: 14px; font-weight: 600; color: var(--color-ink); }
-  .cm-date { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; color: var(--color-muted); }
-  .cm-body { font-size: 14px; line-height: 1.55; color: var(--color-ink); white-space: pre-wrap; }
-  .cm-empty { text-align: center; color: var(--color-muted); padding: 24px; font-size: 13px; }
+  :global(.cm-item:first-child) { border-top: none; }
+  :global(.cm-head) { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  :global(.cm-name) { font-size: 14px; font-weight: 600; color: var(--color-ink); }
+  :global(.cm-date) { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; color: var(--color-muted); }
+  :global(.cm-body) { font-size: 14px; line-height: 1.55; color: var(--color-ink); white-space: pre-wrap; }
+  :global(.cm-empty) { text-align: center; color: var(--color-muted); padding: 24px; font-size: 13px; }
+  :global(.cm-retry) {
+    margin-top: 10px; padding: 6px 14px;
+    border: 1px solid var(--color-border); border-radius: 999px;
+    background: transparent; color: var(--color-ink);
+    font: inherit; font-size: 12px; cursor: pointer;
+  }
 </style>
 
-<script define:vars={{ API: site.api.baseUrl, SITE_KEY: site.api.turnstileSiteKey }}>
-  document.querySelectorAll('[data-comentarios]').forEach((root) => {
+<script>
+  import { createVerifier, verifMessage, getJson } from '../scripts/verificacion';
+
+  type Comentario = { id: string; nombre: string; mensaje: string; date: string };
+
+  document.querySelectorAll<HTMLElement>('[data-comentarios]').forEach((root) => {
+    const API = root.dataset.api!;
     let currentSlug = root.dataset.slug || '';
-    const form = root.querySelector('[data-cm-form]');
-    const listEl = root.querySelector('[data-cm-list]');
-    const countEl = root.querySelector('[data-cm-count]');
-    const msgEl = root.querySelector('[data-cm-msg]');
-    const submitBtn = root.querySelector('[data-cm-submit]');
-    const container = root.querySelector('[data-turnstile-container]');
-    const statusEl = root.querySelector('[data-turnstile-status]');
+    const form = root.querySelector<HTMLFormElement>('[data-cm-form]')!;
+    const listEl = root.querySelector<HTMLElement>('[data-cm-list]')!;
+    const countEl = root.querySelector<HTMLElement>('[data-cm-count]')!;
+    const msgEl = root.querySelector<HTMLElement>('[data-cm-msg]')!;
+    const submitBtn = root.querySelector<HTMLButtonElement>('[data-cm-submit]')!;
+    const statusEl = root.querySelector<HTMLElement>('[data-turnstile-status]')!;
+    const verifier = createVerifier(
+      root.querySelector<HTMLElement>('[data-turnstile-container]')!,
+      root.dataset.sitekey!,
+      {
+        onInteractive: () => { statusEl.textContent = 'Marca la casilla para confirmar que eres humano.'; },
+        onToken: () => { statusEl.textContent = ''; },
+      },
+    );
 
-    let currentToken = null;
-    let widgetId = null;
+    let comentarios: Comentario[] = [];
 
-    const fmt = (iso) => new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '');
-    const escape = (s) => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const fmt = (iso: string) => new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '');
+    const escape = (s: unknown) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
-    const enable = () => { if (submitBtn) submitBtn.disabled = false; };
-    const disable = () => { if (submitBtn) submitBtn.disabled = true; };
-
-    const renderTurnstile = () => {
-      if (!window.turnstile || !container) return;
-      container.innerHTML = '';
-      widgetId = window.turnstile.render(container, {
-        sitekey: SITE_KEY,
-        theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
-        appearance: 'interaction-only',
-        callback: (t) => { currentToken = t; enable(); if (statusEl) statusEl.textContent = ''; },
-        'expired-callback': () => { currentToken = null; disable(); },
-        'error-callback': () => { currentToken = null; disable(); if (msgEl) msgEl.textContent = 'Error de verificación.'; },
-      });
-    };
-    const waitForTurnstile = () => {
-      if (window.turnstile) return renderTurnstile();
-      let tries = 0;
-      const iv = setInterval(() => {
-        if (window.turnstile || tries++ > 50) {
-          clearInterval(iv);
-          if (window.turnstile) renderTurnstile();
-          else if (statusEl) statusEl.textContent = 'No se pudo cargar la verificación anti-bot.';
-        }
-      }, 200);
-    };
-    waitForTurnstile();
-
-    const render = (comentarios) => {
-      if (countEl) countEl.textContent = String(comentarios.length);
-      if (!listEl) return;
+    const render = () => {
+      countEl.textContent = String(comentarios.length);
       if (comentarios.length === 0) {
         listEl.innerHTML = '<div class="cm-empty">Todavía no hay comentarios. Sé el primero.</div>';
         return;
@@ -134,70 +122,89 @@ const { slug } = Astro.props;
 
     const load = async () => {
       if (!currentSlug) return;
-      if (countEl) countEl.textContent = '—';
-      if (listEl) listEl.innerHTML = '<div class="cm-empty">Cargando…</div>';
+      const slug = currentSlug;
+      countEl.textContent = '—';
+      listEl.innerHTML = '<div class="cm-empty">Cargando…</div>';
       try {
-        const r = await fetch(`${API}/comentarios/${encodeURIComponent(currentSlug)}`);
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const data = await r.json();
-        render(data.comentarios || []);
+        const data = await getJson<{ comentarios?: Comentario[] }>(`${API}/comentarios/${encodeURIComponent(slug)}`);
+        if (slug !== currentSlug) return; // el usuario ya cambió de nota
+        comentarios = data.comentarios || [];
+        render();
       } catch (err) {
-        console.warn('[comentarios] load failed:', err);
-        // No mostramos error alarmante — tratamos como lista vacía.
-        // Si de verdad hay un problema, el usuario verá el warning en consola
-        // y al enviar un comentario obtendrá un mensaje de error específico.
-        render([]);
+        if (slug !== currentSlug) return;
+        listEl.innerHTML = `<div class="cm-empty">No se han podido cargar los comentarios (${escape((err as Error).message)}).<br>
+          <button type="button" class="cm-retry">Reintentar</button></div>`;
+        listEl.querySelector('.cm-retry')?.addEventListener('click', load);
       }
     };
 
-    form?.addEventListener('submit', async (e) => {
+    // La verificación arranca cuando el usuario se pone a escribir
+    form.addEventListener('focusin', () => verifier.warm(), { once: true });
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentSlug) return;
+      const slug = currentSlug;
       const fd = new FormData(form);
       const nombre = fd.get('nombre');
       const mensaje = fd.get('mensaje');
-      if (!currentToken) {
-        if (msgEl) msgEl.textContent = 'Espera a que cargue la verificación.';
+      submitBtn.disabled = true;
+      msgEl.textContent = '';
+      if (!statusEl.textContent) statusEl.textContent = 'Verificando…';
+
+      let token: string;
+      try {
+        token = await verifier.getToken();
+      } catch (err) {
+        statusEl.textContent = '';
+        msgEl.textContent = verifMessage(err);
+        submitBtn.disabled = false;
         return;
       }
-      disable();
-      if (msgEl) msgEl.textContent = 'Enviando…';
-      let r, data;
+
+      statusEl.textContent = 'Enviando…';
+      let r: Response, data: any;
       try {
-        r = await fetch(`${API}/comentarios/${encodeURIComponent(currentSlug)}`, {
+        r = await fetch(`${API}/comentarios/${encodeURIComponent(slug)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombre, mensaje, token: currentToken }),
+          body: JSON.stringify({ nombre, mensaje, token }),
         });
-        data = await r.json();
+        data = await r.json().catch(() => ({}));
       } catch (err) {
-        if (msgEl) msgEl.textContent = 'Error de red. Inténtalo de nuevo.';
-        enable();
-        currentToken = null;
-        if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+        console.error('[comentarios] fetch failed:', err);
+        statusEl.textContent = '';
+        msgEl.textContent = 'No hay conexión con el servidor. Dale otra vez en un momento.';
+        verifier.consume();
+        submitBtn.disabled = false;
         return;
       }
+      verifier.consume();
+      statusEl.textContent = '';
+      submitBtn.disabled = false;
+
       if (!r.ok) {
-        if (msgEl) msgEl.textContent = `Error: ${data.error || 'no se pudo comentar'}`;
-        currentToken = null;
-        if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+        msgEl.textContent = r.status === 403
+          ? 'La verificación ha caducado. Dale otra vez a Comentar.'
+          : `No se pudo comentar: ${data.error || `HTTP ${r.status}`}`;
         return;
       }
-      if (msgEl) msgEl.textContent = '✓ Comentario publicado';
+      msgEl.textContent = '✓ Comentario publicado';
       form.reset();
-      currentToken = null;
-      if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
-      load();
+      // Lo pintamos al momento: el KV puede tardar en devolverlo en otra lectura
+      if (data.comentario && slug === currentSlug) {
+        comentarios = [...comentarios.filter((c) => c.id !== data.comentario.id), data.comentario];
+        render();
+      }
     });
 
     // Recarga cuando cambia la nota abierta
     document.addEventListener('note:changed', (ev) => {
-      const slug = ev?.detail?.slug;
+      const slug = (ev as CustomEvent).detail?.slug;
       if (!slug || slug === currentSlug) return;
       currentSlug = slug;
       root.dataset.slug = slug;
-      if (msgEl) msgEl.textContent = '';
-      console.log('[comentarios] note:changed → slug =', slug);
+      msgEl.textContent = '';
       load();
     });
 
