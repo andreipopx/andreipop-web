@@ -21,7 +21,8 @@ const cosas = defineCollection({
     year: z.number(),
     kind: z.enum(['proyecto', 'paper', 'charla', 'otro']).default('proyecto'),
     accent: z.enum(['indigo', 'orange', 'emerald', 'violet', 'amber']).default('indigo'),
-    initial: z.string().length(1),
+    initial: z.string().length(1).optional(),
+    icon: z.string().optional(), // ruta en public/, sustituye a la inicial
     url: z.string().url().optional(),
     repo: z.string().url().optional(),
     tags: z.array(z.string()).default([]),

@@ -13,6 +13,8 @@ const gradients: Record<string, string> = {
   violet:  'linear-gradient(160deg, #7c3aed, #a855f7)',
   amber:   'linear-gradient(160deg, #f59e0b, #f97316)',
 };
+
+const host = (url: string) => new URL(url).host.replace(/^www\./, '');
 ---
 <Window slug="cosas" title={`Cosas — ${cosas.length}`} x={200} y={140} width={720} height={560} z={100}>
   {cosas.length === 0 ? (
@@ -24,18 +26,20 @@ const gradients: Record<string, string> = {
     <div style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
       {cosas.map((c) => {
         const externalHref = c.data.url ?? c.data.repo;
-        const cardStyle = `background: ${gradients[c.data.accent] ?? gradients.indigo}; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px; color: #fff; text-decoration: none;`;
+        const cardStyle = `background: ${gradients[c.data.accent] ?? gradients.indigo}; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 220px; gap: 18px; color: #fff; text-decoration: none;`;
         const inner = (
           <>
-            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.9); color: #0f1115; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">
-              {c.data.initial}
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.94); color: #0f1115; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); flex-shrink: 0;">
+              {c.data.icon
+                ? <img src={c.data.icon} alt="" width="30" height="30" loading="lazy" style="width: 30px; height: 30px; object-fit: contain; display: block;" />
+                : c.data.initial}
             </div>
             <div>
               <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.025em;">{c.data.title}</div>
               <div style="font-size: 13px; opacity: 0.9; margin-top: 6px; line-height: 1.5;">{c.data.tagline}</div>
-              <div class="mono" style="font-size: 10px; opacity: 0.75; margin-top: 10px; letter-spacing: 0.06em; text-transform: uppercase; display: flex; gap: 8px; align-items: center;">
-                <span>{c.data.kind} · {c.data.year}</span>
-                {externalHref && <span>↗</span>}
+              <div class="mono" style="font-size: 10px; opacity: 0.8; margin-top: 12px; letter-spacing: 0.06em; display: flex; flex-direction: column; gap: 4px;">
+                <span style="text-transform: uppercase;">{c.data.kind} · {c.data.year}</span>
+                {externalHref && <span>{host(externalHref)} ↗</span>}
               </div>
             </div>
           </>
